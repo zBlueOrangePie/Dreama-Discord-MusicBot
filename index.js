@@ -24,9 +24,16 @@ process.on("unhandledRejection", (reason) => {
     logger.error("Unhandled Promise Rejection", reason);
 });
 
-console.log(`[Bot] ‼️ Music Is Loading... Please wait!`);
-console.log(`[Info] ‼️ Created By: zBlueOrangePie. Github ---> https://github.com/zBlueOrangePie`);
-console.log(`[Warning] ⚠️ You cannot use this for commercial use or claim that you own this code!!`);
+console.log(`
+  ██████╗ ██████╗ ███████╗ █████╗ ███╗   ███╗ █████╗ 
+  ██╔══██╗██╔══██╗██╔════╝██╔══██╗████╗ ████║██╔══██╗
+  ██║  ██║██████╔╝█████╗  ███████║██╔████╔██║███████║
+  ██║  ██║██╔══██╗██╔══╝  ██╔══██║██║╚██╔╝██║██╔══██║
+  ██████╔╝██║  ██║███████╗██║  ██║██║ ╚═╝ ██║██║  ██║
+  ╚═════╝ ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝
+`);
+console.log(`[Info] ‼️ Created By: zBlueOrangePie. Github ---> https://github.com/zBlueOrangePie/Dreama-Discord-MusicBot`);
+console.log(`[Warning] ⚠️ You cannot claim that you own this code!!`);
 
 async function getChannel(channelId) {
     if (!channelId) return null;
