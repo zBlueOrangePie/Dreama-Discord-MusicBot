@@ -28,7 +28,7 @@ const helpEmbed = new EmbedBuilder()
     .addFields(
      {
      name: "Music Commands",
-     value: "**/play**, **/pause**, **resume**, **/queue**, **/filters**, /autoplay",
+     value: "**/play**, **/stop**, **/pause**, **resume**, **/queue**, **/filters**, /autoplay",
      inline: false
     },
     {
