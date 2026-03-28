@@ -355,11 +355,11 @@ client.once("clientReady", () => {
     console.log(`[Info] 💪 Big Thanks also to orange0990 for helping me create this!`);
 
     client.user.setPresence({
-        activities : [{ 
+        activities: [{ 
          name: "/help | Dreama", 
          type: ActivityType.Watching   
         }],
-        status     : "online",
+        status: "online",
     });
     client.lavalink.init({ ...client.user });
 });
