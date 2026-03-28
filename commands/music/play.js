@@ -1,6 +1,7 @@
 require("dotenv").config();
 const { SlashCommandBuilder, EmbedBuilder, MessageFlags } = require("discord.js");
 const { formatDuration } = require("../../utils/formatDuration.js");
+const { syncNpMessage } = require("../../utils/npButtonUtils.js");
 
 const COLORS = {
     DEFAULT: "5865F2",
@@ -36,7 +37,7 @@ module.exports = {
                         .setFooter({ text: footer })
                         .setTimestamp(),
                 ],
-                ephemeral: true,
+                flags: MessageFlags.Ephemeral
             });
         }
 
@@ -106,7 +107,6 @@ module.exports = {
                         .setFooter({ text: footer })
                         .setTimestamp(),
                 ],
-              flags: MessageFlags.Ephemeral,
             });
         }
 
@@ -114,6 +114,8 @@ module.exports = {
 
         if (result.loadType === "playlist") {
             await player.queue.add(result.tracks);
+
+            if (wasPlaying) await syncNpMessage(player);
 
             await interaction.editReply({
                 embeds: [
@@ -123,14 +125,14 @@ module.exports = {
                         .setDescription(`**[${result.playlist.name}](${query})**`)
                         .addFields(
                             { 
-                              name: "Tracks",       
-                              value: `${result.tracks.length}`, 
-                              inline: true 
+                                name: "Tracks",       
+                                value: `${result.tracks.length}`, 
+                                inline: true 
                             },
                             { 
-                              name: "Requested By", 
-                              value: `${interaction.user}`,    
-                              inline: true 
+                                name: "Requested By", 
+                                value: `${interaction.user}`,     
+                                inline: true 
                             },
                         )
                         .setFooter({ text: footer })
@@ -146,25 +148,27 @@ module.exports = {
             await player.queue.add(track);
 
             if (wasPlaying) {
+                await syncNpMessage(player);
+
                 const addedEmbed = new EmbedBuilder()
                     .setColor(COLORS.DEFAULT)
                     .setTitle("🎵 Added to Queue!")
                     .setDescription(`**[${track.info.title}](${track.info.uri})**`)
                     .addFields(
                         { 
-                          name: "Author",       
-                          value: track.info.author || "Unknown",    
-                          inline: true 
+                            name: "Author",       
+                            value: track.info.author || "Unknown",      
+                            inline: true 
                         },
                         { 
-                          name: "Duration",     
-                          value: formatDuration(track.info.duration), 
-                          inline: true 
+                            name: "Duration",     
+                            value: formatDuration(track.info.duration), 
+                            inline: true 
                         },
                         { 
-                          name: "Requested By", 
-                          value: `${interaction.user}`,               
-                          inline: true 
+                            name: "Requested By", 
+                            value: `${interaction.user}`,               
+                            inline: true 
                         },
                     )
                     .setFooter({ text: footer })
@@ -181,4 +185,3 @@ module.exports = {
         if (!wasPlaying) await player.play();
     },
 };
-  
