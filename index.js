@@ -304,6 +304,11 @@ client.lavalink.on("trackError", async (player, track, payload) => {
 client.lavalink.on("queueEnd", async (player) => {
     console.log(`[Events] ✅ Event "queueEnd" fired`);
 
+    if (player.get("manualStop")) {
+        player.set("manualStop", false);
+        return;
+    }
+
     if (player.npMessage) {
         player.npMessage.edit({ components: [buildDisabledNpRow()] }).catch(() => null);
         player.npMessage = null;
@@ -345,7 +350,7 @@ client.lavalink.on("queueEnd", async (player) => {
     const queueEndEmbed = new EmbedBuilder()
         .setColor(COLORS.DEFAULT)
         .setTitle("📭 Queue Ended")
-        .setDescription(`The queue is now empty because of either user **requested to stop the track** or because of **inactivity**. Add more songs with \`/play\`!\n\n⏳ I will be leaving the voice channel in **${minutesLeft} minutes** if no song is played.`)
+        .setDescription(`The queue has run out of songs. Add more with \`/play\`!\n\n⏳ I will be leaving the voice channel in **${minutesLeft} minutes** if no song is played.`)
         .setFooter({ text: footer })
         .setTimestamp();
 
@@ -397,4 +402,3 @@ client.once("clientReady", () => {
 });
 
 client.login(process.env.TOKEN);
-                                                          
