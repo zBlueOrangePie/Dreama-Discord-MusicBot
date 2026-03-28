@@ -154,6 +154,7 @@ async function handleNpButton(interaction, client) {
     }
 
     if (id === "np_stop") {
+        player.set("manualStop", true);
         await player.stopPlaying(true, false);
         await player.destroy();
         return interaction.update({ components: [buildDisabledNpRow()] });
