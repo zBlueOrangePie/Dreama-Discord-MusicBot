@@ -63,6 +63,7 @@ module.exports = {
             });
         }
 
+        player.set("manualStop", true);
         await player.stopPlaying(true, false);
         await player.destroy();
 
@@ -79,4 +80,3 @@ module.exports = {
         });
     },
 };
-          
