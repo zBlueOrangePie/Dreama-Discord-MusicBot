@@ -253,6 +253,22 @@ client.lavalink.on("trackEnd", async (player) => {
     if (player.npMessage) {
         player.npMessage.edit({ components: [buildDisabledNpRow()] }).catch(() => null);
         player.npMessage = null;
+
+    const channel = await getChannel(player.textChannelId);
+      if (!channel) return;
+    const footer = process.env.FOOTER || "Dreama";
+
+        const endEmbed = new EmbedBuilder()
+           .setColor(COLORS.ERROR)
+           .setTitle("👋 I Have now left the vc")
+           .setDescription("The music has been stopped because of **user requested to stop.**n/n/" + 
+                           "Both **queue** and **current track** are __destroyed.__")
+           .setFooter({ text: footer })
+           .setTimestamp();
+
+    channel.send({ embeds: [endEmbed] }).catch((err) => {
+        logger.error("Failed to send trackEnd embed", err);
+      });
     }
 });
 
@@ -340,7 +356,7 @@ client.lavalink.on("queueEnd", async (player) => {
     const queueEndEmbed = new EmbedBuilder()
         .setColor(COLORS.DEFAULT)
         .setTitle("📭 Queue Ended")
-        .setDescription(`The queue is now empty. Add more songs with \`/play\`!\n\n⏳ I will leave the voice channel in **${minutesLeft} minutes** if no song is played.`)
+        .setDescription(`The queue is now empty because of either user **requested to stop the track** or because of **inactivity**. Add more songs with \`/play\`!\n\n⏳ I will be leaving the voice channel in **${minutesLeft} minutes** if no song is played.`)
         .setFooter({ text: footer })
         .setTimestamp();
 
