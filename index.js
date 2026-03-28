@@ -92,9 +92,6 @@ client.lavalink = new LavalinkManager({
             autoReconnect: true,
             destroyPlayer: false,
         },
-        onEmptyQueue: {
-            destroyAfterMs: 30_000,
-        },
     },
     client: {
         id: process.env.CLIENT_ID,
