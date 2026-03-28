@@ -1,14 +1,30 @@
-# Dreama — Discord Music Bot
+# ✨ Dreama — Discord Music Bot
 
-A Discord music bot built with [discord.js v14](https://discord.js.org/) and [lavalink-client](https://github.com/Tomato6966/lavalink-client), powered by a Lavalink v4 audio server.
+🎶 A Discord music bot built with [discord.js v14](https://discord.js.org/) and [lavalink-client](https://github.com/Tomato6966/lavalink-client), powered by a Lavalink v4 audio server.
+
+‼️ This **code** was close to the documentation of **[lavalink-client](https://tomato6966.github.io/lavalink-client).** Please always give credits to **@zBlueOrangePie** when using this code.
+
+## Features
+
+- **🎛️ Filters**
+- **📋 Advanced Queue**
+- **🔍 Song Searching**
+- **✅ Easy to host**
+- **🎶 Music with controllable buttons**
+- **✨ Music Cards**
+- **🤖 Autoplay/recommendations music**
+
+## Example of the nowplaying image
+
+![Image Now Playing Card!](/assets/nowplaying.png)
 
 ---
 
 ## Requirements
 
-- **Node.js** v18 or higher
-- A running **Lavalink v4** server ([setup guide](https://tomato6966.github.io/lavalink-client/home/setup-lavalink))
-- A **Discord Bot** application with the correct intents enabled
+- 🟢 **Node.js** v18 or higher
+- 🟢 A running **Lavalink v4** server ([setup guide](https://tomato6966.github.io/lavalink-client/home/setup-lavalink))
+- 🟢 A **Discord Bot** application with the correct intents enabled
 
 ---
 
@@ -26,7 +42,7 @@ npm install
 
 Copy the example env file and fill in your values:
 
-```js
+```bash
 cp .envExample .env
 ```
 
@@ -59,7 +75,7 @@ Before running the bot for the first time, register the slash commands with Disc
 
 This only needs to be run once, or again whenever you add or modify a command.
 
-```js
+```bash
 node deploy-cmds.js
 ```
 
@@ -67,7 +83,7 @@ node deploy-cmds.js
 
 The code already has a configured file that deletes all global slash commands use this in your terminal to delete all global slash commands
 
-```js
+```bash
 node deleteCommands.js
 ```
 
@@ -75,7 +91,7 @@ node deleteCommands.js
 
 ## Running the Bot
 
-```js
+```bash
 node index.js
 ```
 
@@ -93,4 +109,4 @@ node index.js
 
 ## LICENSE
 
-- PolyForm License > Anyone Can Use It But ALWAYS give credits to the original creator, dont use this for commercial use or tell anyone that you created and owned the code yourself.
+- Creative Commons
