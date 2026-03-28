@@ -1,0 +1,10 @@
+TOKEN= # Your Discord bot token
+CLIENT_ID= # Your Discord application/client ID
+USERNAME= # Your bot's display name
+
+LAVA_HOST= # Hostname or IP of your Lavalink server (e.g. localhost)
+LAVA_PORT= # Port your Lavalink server listens on (e.g. 2333)
+LAVA_PASS= # Password set in your Lavalink application.yml
+LAVA_SECURE= # Set to "true" if your Lavalink server uses HTTPS/WSS, otherwise "false"
+
+FOOTER= # Text shown in the footer of embeds (e.g. Dreama)
