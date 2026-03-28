@@ -1,14 +1,16 @@
 require("dotenv").config();
 const { rest } = require("./deploy-cmds.js");
 const { LavalinkManager } = require("lavalink-client");
-const { Client, Collection, GatewayIntentBits, ActivityType, EmbedBuilder, Events, } = require("discord.js");
+const { Client, Collection, GatewayIntentBits, ActivityType, EmbedBuilder, AttachmentBuilder, Events } = require("discord.js");
 const fs = require("fs");
 const path = require("path");
+
 const { loadCommands } = require("./utils/loadCommands.js");
 const { logger } = require("./utils/logger.js");
 const { formatDuration } = require("./utils/formatDuration.js");
 const { buildNpRow, buildDisabledNpRow } = require("./utils/npButtonUtils.js");
 const { startTimer, clearTimer, INACTIVITY_MS } = require("./utils/inactivityTimer.js");
+const { buildNpImageCard } = require("./utils/npImageCard.js");
 
 const COLORS = {
     ERROR: "FF0000",
@@ -32,6 +34,7 @@ console.log(`
   ██████╔╝██║  ██║███████╗██║  ██║██║ ╚═╝ ██║██║  ██║
   ╚═════╝ ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝
 `);
+console.log(`[Bot] ‼️ Music Is Loading... Please wait!`);
 console.log(`[Info] ‼️ Created By: zBlueOrangePie. Github ---> https://github.com/zBlueOrangePie/Dreama-Discord-MusicBot`);
 console.log(`[Warning] ⚠️ You cannot claim that you own this code!!`);
 
@@ -105,7 +108,7 @@ client.lavalink.nodeManager.on("reconnecting", (node) => {
 });
 
 client.lavalink.nodeManager.on("error", (node, error) => {
-    logger.error(`Node "${node.id}" encountered an error`, error);
+    logger.error(`[Node] ‼️ Node "${node.id}" encountered an error`, error);
 });
 
 
@@ -177,10 +180,10 @@ client.lavalink.on("trackStart", async (player, track) => {
     }
 
     const footer = process.env.FOOTER || "Dreama";
+    const autoplay = player.get("autoplay") ?? false;
 
-    const artworkUrl = typeof track.info.artworkUrl === "string" && track.info.artworkUrl.startsWith("http")
-        ? track.info.artworkUrl
-        : null;
+    const imageBuffer = await buildNpImageCard(track).catch(() => null);
+    const imageAttachment = imageBuffer ? new AttachmentBuilder(imageBuffer, { name: "nowplaying.png" }) : null;
 
     const startEmbed = new EmbedBuilder()
         .setColor(COLORS.DEFAULT)
@@ -188,29 +191,48 @@ client.lavalink.on("trackStart", async (player, track) => {
         .setDescription(`**[${track.info.title}](${track.info.uri})**\nUse \`/play\` again to add more songs to the queue!`)
         .addFields(
             { 
-             name: "Author",       
-             value: track.info.author,                      
-             inline: true
+                name: "Author",       
+                value: track.info.author,                      
+                inline: true 
             },
             { 
-             name: "Requested By", 
-             value: track.requester?.username ?? "Unknown",  
-             inline: true
+                name: "Requested By", 
+                value: track.requester?.username ?? "Unknown",  
+                inline: true 
             },
             { 
-             name: "Duration",     
-             value: formatDuration(track.info.duration),     
-             inline: true
+                name: "Duration",     
+                value: formatDuration(track.info.duration),     
+                inline: true 
+            },
+            { 
+                name: "Autoplay",     
+                value: autoplay ? "🔀 On" : "Off",             
+                inline: true 
             },
         )
         .setFooter({ text: footer })
         .setTimestamp();
 
-    if (artworkUrl) startEmbed.setThumbnail(artworkUrl);
+    if (imageAttachment) {
+        startEmbed.setImage("attachment://nowplaying.png");
+    } else {
+        const artworkUrl = typeof track.info.artworkUrl === "string" && track.info.artworkUrl.startsWith("http")
+            ? track.info.artworkUrl
+            : null;
+        if (artworkUrl) startEmbed.setThumbnail(artworkUrl);
+    }
 
     const row = buildNpRow(player);
 
-    const npMessage = await channel.send({ embeds: [startEmbed], components: [row] }).catch((err) => {
+    const sendOptions = {
+        embeds     : [startEmbed],
+        components : [row],
+    };
+
+    if (imageAttachment) sendOptions.files = [imageAttachment];
+
+    const npMessage = await channel.send(sendOptions).catch((err) => {
         logger.error("Failed to send trackStart embed", err);
         return null;
     });
@@ -285,10 +307,7 @@ client.lavalink.on("queueEnd", async (player) => {
 
         if (lastTrack) {
             const result = await player.search(
-                { 
-                 query: `${lastTrack.info.title} ${lastTrack.info.author}`,
-                 source: "ytmsearch"
-                },
+                { query: `${lastTrack.info.title} ${lastTrack.info.author}`, source: "ytmsearch" },
                 client.user,
             ).catch(() => null);
 
@@ -356,12 +375,14 @@ client.once("clientReady", () => {
 
     client.user.setPresence({
         activities: [{ 
-         name: "/help | Dreama", 
-         type: ActivityType.Watching   
+            name: "/help | Dreama", 
+            type: ActivityType.Watching 
         }],
         status: "online",
     });
+
     client.lavalink.init({ ...client.user });
 });
 
 client.login(process.env.TOKEN);
+                                                          
