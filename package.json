@@ -9,7 +9,7 @@
   },
   "keywords": ["lavalink", "discord-bot", "music-bot", "discord-music-bot"],
   "author": "zBlueOrangePie",
-  "license": "PolyForm Noncommercial License 1.0.0",
+  "license": "Creative Commons Zero v1.0 Universal",
   "description": "A Discord music bot that uses lavalink for music streaming.",
   "dependencies": {
     "discord.js": "^14.25.1",
