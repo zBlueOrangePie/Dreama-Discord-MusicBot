@@ -22,13 +22,12 @@ const helpEmbed = new EmbedBuilder()
     .setColor("5865F2")
     .setTitle(`${username} - Command Information Guide`)
     
-    .setDescription(`👋 Hi! Im ${username} and im ready to help you! All
-    available commands can be found right here.` +
+    .setDescription(`👋 Hi! Im ${username} and im ready to help you! All available commands can be found right here.` +
     `${username} only uses slash commands **(/)**.`)
     .addFields(
      {
      name: "Music Commands",
-     value: "**/play**, **/stop**, **/pause**, **resume**, **/queue**, **/filters**, /autoplay",
+     value: "**/play**, **/stop**, **/pause**, **/resume**, **/queue**, **/filters**, **/autoplay**",
      inline: false
     },
     {
