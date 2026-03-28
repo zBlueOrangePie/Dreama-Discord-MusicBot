@@ -86,6 +86,16 @@ client.lavalink = new LavalinkManager({
         if (guild) guild.shard.send(payload);
     },
     autoSkip: true,
+    playerOptions: {
+        defaultSearchPlatform: "ytmsearch",
+        onDisconnect: {
+            autoReconnect: true,
+            destroyPlayer: false,
+        },
+        onEmptyQueue: {
+            destroyAfterMs: 30_000,
+        },
+    },
     client: {
         id: process.env.CLIENT_ID,
         username: process.env.USERNAME || "Dreama",
@@ -226,8 +236,8 @@ client.lavalink.on("trackStart", async (player, track) => {
     const row = buildNpRow(player);
 
     const sendOptions = {
-        embeds     : [startEmbed],
-        components : [row],
+        embeds: [startEmbed],
+        components: [row],
     };
 
     if (imageAttachment) sendOptions.files = [imageAttachment];
