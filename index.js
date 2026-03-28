@@ -197,6 +197,11 @@ client.lavalink.on("trackStart", async (player, track) => {
         .setTitle("🎵 Now Playing")
         .setDescription(`**[${track.info.title}](${track.info.uri})**\nUse \`/play\` again to add more songs to the queue!`)
         .addFields(
+            {
+                name: "Source",
+                value: track.info.sourceName,
+                inline: true,
+            },
             { 
                 name: "Author",       
                 value: track.info.author,                      
@@ -253,22 +258,6 @@ client.lavalink.on("trackEnd", async (player) => {
     if (player.npMessage) {
         player.npMessage.edit({ components: [buildDisabledNpRow()] }).catch(() => null);
         player.npMessage = null;
-
-    const channel = await getChannel(player.textChannelId);
-      if (!channel) return;
-    const footer = process.env.FOOTER || "Dreama";
-
-        const endEmbed = new EmbedBuilder()
-           .setColor(COLORS.ERROR)
-           .setTitle("👋 I Have now left the vc")
-           .setDescription("The music has been stopped because of **user requested to stop.**n/n/" + 
-                           "Both **queue** and **current track** are __destroyed.__")
-           .setFooter({ text: footer })
-           .setTimestamp();
-
-    channel.send({ embeds: [endEmbed] }).catch((err) => {
-        logger.error("Failed to send trackEnd embed", err);
-      });
     }
 });
 
