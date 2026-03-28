@@ -1,5 +1,5 @@
 require("dotenv").config();
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, MessageFlags } = require("discord.js");
 
 const REPEAT_CYCLE = {
     off: "track",
@@ -23,6 +23,7 @@ function buildNpRow(player) {
     const paused = player.paused;
     const repeatMode = player.repeatMode ?? "off";
     const autoplay = player.get("autoplay") ?? false;
+    const hasNextTrack = (player.queue?.tracks?.length ?? 0) > 0;
 
     const pauseResumeBtn = new ButtonBuilder()
         .setCustomId("np_pause_resume")
@@ -32,7 +33,8 @@ function buildNpRow(player) {
     const skipBtn = new ButtonBuilder()
         .setCustomId("np_skip")
         .setLabel("⏭️ Skip")
-        .setStyle(ButtonStyle.Secondary);
+        .setStyle(ButtonStyle.Secondary)
+        .setDisabled(!hasNextTrack);
 
     const stopBtn = new ButtonBuilder()
         .setCustomId("np_stop")
@@ -49,7 +51,14 @@ function buildNpRow(player) {
         .setLabel(autoplay ? "🔀 Autoplay: On" : "🔀 Autoplay: Off")
         .setStyle(autoplay ? ButtonStyle.Success : ButtonStyle.Secondary);
 
-    return new ActionRowBuilder().addComponents(pauseResumeBtn, skipBtn, stopBtn, repeatBtn, autoplayBtn);
+    return new ActionRowBuilder()
+        .addComponents(
+            pauseResumeBtn, 
+            skipBtn, 
+            stopBtn, 
+            repeatBtn, 
+            autoplayBtn
+        );
 }
 
 function buildDisabledNpRow() {
@@ -93,11 +102,12 @@ async function syncNpMessage(player) {
 
 async function handleNpButton(interaction, client) {
     const player = client.lavalink.getPlayer(interaction.guildId);
+    const footer = process.env.FOOTER || "Dreama";
 
     if (!player || !player.connected) {
         return interaction.reply({
-            content   : "❌ There is no active player in this server.",
-            ephemeral : true,
+            content: "❌ There is no active player in this server.",
+            flags: MessageFlags.Ephemeral,
         });
     }
 
@@ -105,8 +115,8 @@ async function handleNpButton(interaction, client) {
 
     if (!voiceChannel || voiceChannel.id !== player.voiceChannelId) {
         return interaction.reply({
-            content   : `❌ You must be in <#${player.voiceChannelId}> to use these controls.`,
-            ephemeral : true,
+            content: `❌ You must be in <#${player.voiceChannelId}> to use these controls.`,
+            flags: MessageFlags.Ephemeral,
         });
     }
 
@@ -122,6 +132,22 @@ async function handleNpButton(interaction, client) {
     }
 
     if (id === "np_skip") {
+        const hasNextTrack = (player.queue?.tracks?.length ?? 0) > 0;
+
+        if (!hasNextTrack) {
+            return interaction.reply({
+                embeds: [
+                    new EmbedBuilder()
+                        .setColor("FF0000")
+                        .setTitle("❌ Cannot Skip!")
+                        .setDescription("You can't use this when there is only one song in the current queue. Use **/play** to add more songs or **/stop** or click the stop button if you don't want to listen anymore.")
+                        .setFooter({ text: footer })
+                        .setTimestamp(),
+                ],
+                flags: MessageFlags.Ephemeral
+            });
+        }
+
         await interaction.deferUpdate();
         await player.skip(0, false);
         return;
@@ -135,7 +161,7 @@ async function handleNpButton(interaction, client) {
 
     if (id === "np_repeat") {
         const current = player.repeatMode ?? "off";
-        const next    = REPEAT_CYCLE[current];
+        const next = REPEAT_CYCLE[current];
         await player.setRepeatMode(next);
         return interaction.update({ components: [buildNpRow(player)] });
     }
@@ -144,7 +170,7 @@ async function handleNpButton(interaction, client) {
         const current = player.get("autoplay") ?? false;
         player.set("autoplay", !current);
         return interaction.update({ components: [buildNpRow(player)] });
-  }
+    }
 }
 
 module.exports = { buildNpRow, buildDisabledNpRow, syncNpMessage, handleNpButton };
