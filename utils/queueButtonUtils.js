@@ -1,8 +1,14 @@
 require("dotenv").config();
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } = require("discord.js");
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, MessageFlags } = require("discord.js");
 const { formatDuration } = require("./formatDuration.js");
 
-const MAX_DISPLAY = 10;
+const MAX_DISPLAY = 8;
+const FIELD_MAX = 1024;
+const NP_FIELD_MAX = 512;
+
+function truncate(str, max) {
+    return str.length > max ? str.slice(0, max - 3) + "..." : str;
+}
 
 function buildQueueRow(currentPage, totalPages) {
     const prevBtn = new ButtonBuilder()
@@ -33,28 +39,40 @@ function buildQueueEmbed(player, page) {
     const total = tracks.length;
     const pages = Math.max(1, Math.ceil(total / MAX_DISPLAY));
 
+    const npTitle = current ? truncate(current.info.title, 60) : null;
+    const npAuthor = current ? truncate(current.info.author, 40) : null;
+
     const nowPlaying = current
-        ? [
-            `**[${current.info.title}](${current.info.uri})**`,
-            `By **${current.info.author}** | ${formatDuration(current.info.duration)} | Requested by ${current.requester?.username ?? "Unknown"}`,
-          ].join("\n")
+        ? truncate(
+            `**[${npTitle}](${current.info.uri})**\nBy **${npAuthor}** | ${formatDuration(current.info.duration)} | Requested by ${current.requester?.username ?? "Unknown"}`,
+            NP_FIELD_MAX
+          )
         : "Nothing is playing right now.";
 
     const start = page * MAX_DISPLAY;
     const slice = tracks.slice(start, start + MAX_DISPLAY);
 
-    let queueList = "";
+    let queueList = "No tracks in the queue. Use `/play` to add more!";
 
     if (slice.length > 0) {
-        queueList = slice
-            .map((track, i) => {
-                const pos = start + i + 1;
-                return `\`${pos}.\` **[${track.info.title}](${track.info.uri})**\n` +
-                       `   By **${track.info.author}** | ${formatDuration(track.info.duration)} | Requested by ${track.requester?.username ?? "Unknown"}`;
-            })
-            .join("\n\n");
-    } else {
-        queueList = "No tracks in the queue. Use `/play` to add more!";
+        const lines = [];
+        let used = 0;
+
+        for (const [i, track] of slice.entries()) {
+            const pos = start + i + 1;
+            const title = truncate(track.info.title, 50);
+            const line = `\`${pos}.\` **${title}**\n   ${truncate(track.info.author, 30)} • ${formatDuration(track.info.duration)} • ${track.requester?.username ?? "Unknown"}\n`;
+
+            if (used + line.length > FIELD_MAX - 20) {
+                lines.push(`*...and more tracks on the next page.*`);
+                break;
+            }
+
+            lines.push(line);
+            used += line.length;
+        }
+
+        queueList = lines.join("\n");
     }
 
     const totalDuration = tracks.reduce((acc, t) => acc + (t.info.duration || 0), 0);
@@ -69,10 +87,10 @@ function buildQueueEmbed(player, page) {
             },
             {
                 name: `Up Next — ${total} track(s)`,
-                value: queueList,
+                value: truncate(queueList, FIELD_MAX),
             },
         )
-        .setFooter({ text: `${footer} • Total queue duration: ${formatDuration(totalDuration)} • Page ${page + 1}/${pages}` })
+        .setFooter({ text: truncate(`${footer} • Total queue duration: ${formatDuration(totalDuration)} • Page ${page + 1}/${pages}`, 2048) })
         .setTimestamp();
 }
 
@@ -81,8 +99,8 @@ async function handleQueueButton(interaction, client) {
 
     if (!player || !player.connected) {
         return interaction.reply({
-            content  : "❌ There is no active player in this server.",
-            ephemeral : true,
+            content: "❌ There is no active player in this server.",
+            flags: MessageFlags.Ephemeral,
         });
     }
 
