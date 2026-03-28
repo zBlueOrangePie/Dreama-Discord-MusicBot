@@ -9,8 +9,8 @@
     "start": "node index.js"
   },
   "keywords": ["lavalink", "discord-bot", "music-bot", "discord-music-bot"],
-  "author": "",
-  "license": "ISC",
+  "author": "zBlueOrangePie",
+  "license": "PolyForm Noncommercial License 1.0.0",
   "description": "",
   "dependencies": {
     "discord.js": "^14.25.1",
