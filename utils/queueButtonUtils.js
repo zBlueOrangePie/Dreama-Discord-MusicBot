@@ -39,6 +39,15 @@ function buildQueueEmbed(player, page) {
     const total = tracks.length;
     const pages = Math.max(1, Math.ceil(total / MAX_DISPLAY));
 
+    const autoplay = player.get("autoplay") ?? false;
+    const repeatMode = player.repeatMode ?? "off";
+
+    const repeatLabels = {
+        off: "Off",
+        track: "🔂 Track",
+        queue: "🔁 Queue",
+    };
+
     const npTitle = current ? truncate(current.info.title, 60) : null;
     const npAuthor = current ? truncate(current.info.author, 40) : null;
 
@@ -88,6 +97,16 @@ function buildQueueEmbed(player, page) {
             {
                 name: `Up Next — ${total} track(s)`,
                 value: truncate(queueList, FIELD_MAX),
+            },
+            {
+                name: "🔀 Autoplay",
+                value: autoplay ? "On" : "Off",
+                inline: true,
+            },
+            {
+                name: "🔁 Repeat",
+                value: repeatLabels[repeatMode] ?? "Off",
+                inline: true,
             },
         )
         .setFooter({ text: truncate(`${footer} • Total queue duration: ${formatDuration(totalDuration)} • Page ${page + 1}/${pages}`, 2048) })
