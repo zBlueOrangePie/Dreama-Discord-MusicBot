@@ -6,6 +6,7 @@
 
 ## 🚀 Features
 
+- **🔗 Supports YouTube and SoundCloud Searches/Queries**
 - **🎛️ Filters**
 - **📋 Advanced Queue**
 - **🔍 Song Searching**
