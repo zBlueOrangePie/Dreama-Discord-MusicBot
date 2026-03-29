@@ -1,0 +1,153 @@
+require("dotenv").config();
+const { SlashCommandBuilder, EmbedBuilder, AttachmentBuilder, MessageFlags } = require("discord.js");
+const { buildSearchCard }                                  = require("../../utils/searchCard.js");
+const { storeSearchData, buildSearchRows }                 = require("../../utils/searchButtonUtils.js");
+
+const COLORS = {
+    DEFAULT: "5865F2",
+    ERROR: "FF0000",
+};
+
+const SOURCE_MAP = {
+    soundcloud: "scsearch",
+    youtube: "ytsearch",
+};
+
+module.exports = {
+    data: new SlashCommandBuilder()
+        .setName("search")
+        .setDescription("Search for songs and choose what to play.")
+        .addStringOption(option =>
+            option
+                .setName("query")
+                .setDescription("Song name to search for.")
+                .setRequired(true)
+        )
+        .addBooleanOption(option =>
+            option
+                .setName("soundcloud")
+                .setDescription("Search on SoundCloud.")
+                .setRequired(false)
+        )
+        .addBooleanOption(option =>
+            option
+                .setName("youtube")
+                .setDescription("Search on YouTube.")
+                .setRequired(false)
+        ),
+
+    async execute(interaction) {
+        const client = interaction.client;
+        const member = interaction.member;
+        const guild = interaction.guild;
+        const voiceChannel = member.voice?.channel;
+        const footer = process.env.FOOTER || "Dreama";
+
+        const query = interaction.options.getString("query");
+        const useSC = interaction.options.getBoolean("soundcloud");
+        const useYT = interaction.options.getBoolean("youtube");
+
+        let source = "ytmsearch";
+        if (useSC) 
+          source = SOURCE_MAP.soundcloud;
+        else if (useYT) 
+          source = SOURCE_MAP.youtube;
+
+        if (!voiceChannel) {
+            return interaction.reply({
+                embeds: [
+                    new EmbedBuilder()
+                        .setColor(COLORS.ERROR)
+                        .setTitle("‼️ Please Join A Voice Channel First!")
+                        .setDescription("❌ You need to be in a voice channel to use this command.")
+                        .setFooter({ text: footer })
+                        .setTimestamp(),
+                ],
+                flags: MessageFlags.Ephemeral,
+            });
+        }
+
+        const botVoiceChannel = guild.members.me?.voice?.channel;
+        if (botVoiceChannel && botVoiceChannel.id !== voiceChannel.id) {
+            return interaction.reply({
+                embeds: [
+                    new EmbedBuilder()
+                        .setColor(COLORS.ERROR)
+                        .setTitle("‼️ I'm Already Playing!")
+                        .setDescription(`❌ I'm already in <#${botVoiceChannel.id}>. Join that channel to use me.`)
+                        .setFooter({ text: footer })
+                        .setTimestamp(),
+                ],
+                flags: MessageFlags.Ephemeral,
+            });
+        }
+
+        if (!client.lavalink.useable) {
+            return interaction.reply({
+                embeds: [
+                    new EmbedBuilder()
+                        .setColor(COLORS.ERROR)
+                        .setTitle("❌ Internal Error Occurred.")
+                        .setDescription("❌ No music nodes are available right now. Please try again later.")
+                        .setFooter({ text: footer })
+                        .setTimestamp(),
+                ],
+                flags: MessageFlags.Ephemeral,
+            });
+        }
+
+        await interaction.deferReply();
+
+        const player = client.lavalink.createPlayer({
+            guildId: guild.id,
+            voiceChannelId: voiceChannel.id,
+            textChannelId: interaction.channel.id,
+            selfDeaf: true,
+        });
+
+        if (!player.connected) 
+          await player.connect();
+
+        const result = await player.search({ query, source }, interaction.user);
+
+        if (!result?.tracks?.length || result.loadType === "empty" || result.loadType === "error") {
+            return interaction.editReply({
+                embeds: [
+                    new EmbedBuilder()
+                        .setColor(COLORS.ERROR)
+                        .setTitle("❌ No Results Found")
+                        .setDescription(`No results were found for **${query}**.`)
+                        .setFooter({ text: footer })
+                        .setTimestamp(),
+                ],
+            });
+        }
+
+        const tracks = result.tracks.slice(0, 5);
+
+        const imageBuffer = await buildSearchCard(tracks, query).catch(() => null);
+        const imageAttachment = imageBuffer ? new AttachmentBuilder(imageBuffer, { name: "search.png" }) : null;
+
+        const sourceLabel = useSC ? "SoundCloud" : useYT ? "YouTube" : "YouTube Music";
+
+        const searchEmbed = new EmbedBuilder()
+            .setColor(COLORS.DEFAULT)
+            .setTitle("🔍 Search Results")
+            .setDescription(`Showing **${tracks.length}** result(s) for **${query}** on **${sourceLabel}**.\nSelect a song below or click **Play All** to queue everything.`)
+            .setFooter({ text: footer })
+            .setTimestamp();
+
+        if (imageAttachment) 
+          searchEmbed.setImage("attachment://search.png");
+
+        const rows = buildSearchRows(tracks);
+
+        const sendOptions = { embeds: [searchEmbed], components: rows };
+        if (imageAttachment) 
+          sendOptions.files = [imageAttachment];
+
+        const sentMessage = await interaction.editReply(sendOptions);
+
+        storeSearchData(sentMessage.id, { tracks, source });
+    },
+};
