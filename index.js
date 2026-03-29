@@ -78,7 +78,7 @@ client.lavalink = new LavalinkManager({
             host: process.env.LAVA_HOST,
             port: Number(process.env.LAVA_PORT),
             secure: process.env.LAVA_SECURE === "true",
-            id: "Main Node",
+            id: "Dreama Node",
         },
     ],
     sendToShard: (guildId, payload) => {
@@ -88,6 +88,7 @@ client.lavalink = new LavalinkManager({
     autoSkip: true,
     playerOptions: {
         defaultSearchPlatform: "ytmsearch",
+        defaultVolume: 75,
         onDisconnect: {
             autoReconnect: true,
             destroyPlayer: false,
@@ -188,6 +189,7 @@ client.lavalink.on("trackStart", async (player, track) => {
 
     const footer = process.env.FOOTER || "Dreama";
     const autoplay = player.get("autoplay") ?? false;
+    const volume = player.volume ?? 75;
 
     const imageBuffer = await buildNpImageCard(track).catch(() => null);
     const imageAttachment = imageBuffer ? new AttachmentBuilder(imageBuffer, { name: "nowplaying.png" }) : null;
@@ -197,29 +199,34 @@ client.lavalink.on("trackStart", async (player, track) => {
         .setTitle("🎵 Now Playing")
         .setDescription(`**[${track.info.title}](${track.info.uri})**\nUse \`/play\` again to add more songs to the queue!`)
         .addFields(
-            {
-                name: "Source",
-                value: track.info.sourceName,
-                inline: true,
+            { 
+                name: "Source",       
+                value: track.info.sourceName,                          
+                inline: true 
             },
             { 
                 name: "Author",       
-                value: track.info.author,                      
+                value: track.info.author,                              
                 inline: true 
             },
             { 
                 name: "Requested By", 
-                value: track.requester?.username ?? "Unknown",  
+                value: track.requester?.username ?? "Unknown",         
                 inline: true 
             },
             { 
                 name: "Duration",     
-                value: formatDuration(track.info.duration),     
+                value: formatDuration(track.info.duration),            
                 inline: true 
             },
             { 
                 name: "Autoplay",     
-                value: autoplay ? "🔀 On" : "Off",             
+                value: autoplay ? "🔀 On" : "Off",                    
+                inline: true 
+            },
+            { 
+                name: "Volume",       
+                value: `🔊 ${volume}%`,                               
                 inline: true 
             },
         )
@@ -237,11 +244,7 @@ client.lavalink.on("trackStart", async (player, track) => {
 
     const row = buildNpRow(player);
 
-    const sendOptions = {
-        embeds: [startEmbed],
-        components: [row],
-    };
-
+    const sendOptions = { embeds: [startEmbed], components: [row] };
     if (imageAttachment) sendOptions.files = [imageAttachment];
 
     const npMessage = await channel.send(sendOptions).catch((err) => {
@@ -316,7 +319,6 @@ client.lavalink.on("queueEnd", async (player) => {
 
     const channel = await getChannel(player.textChannelId);
     const footer = process.env.FOOTER || "Dreama";
-
     const autoplay = player.get("autoplay") ?? false;
 
     if (autoplay) {
@@ -393,7 +395,7 @@ client.once("clientReady", () => {
     client.user.setPresence({
         activities: [{ 
             name: "/help | Dreama", 
-            type: ActivityType.Watching 
+            type: ActivityType.Watching,
         }],
         status: "online",
     });
@@ -402,3 +404,4 @@ client.once("clientReady", () => {
 });
 
 client.login(process.env.TOKEN);
+            
