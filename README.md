@@ -14,7 +14,7 @@
 - **✨ Music Cards**
 - **🤖 Autoplay/recommendations music**
 
-## 🤯 Example of the nowplaying image
+## 🤯 Example of the nowplaying image card!
 
 ![Image Now Playing Card!](/assets/nowplaying.png)
 
