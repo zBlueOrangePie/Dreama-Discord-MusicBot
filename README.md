@@ -17,7 +17,13 @@
 
 ## 🤯 Example of the nowplaying image card!
 
-![Image Now Playing Card!](/assets/nowplaying.png)
+![👀 Previews!](/assets/nowplaying-3.png)
+
+
+![Search Card Image!](assets/search.png)
+
+
+![Volume Card Image!](assets/volume.png)
 
 ---
 
