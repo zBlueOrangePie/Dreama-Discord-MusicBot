@@ -4,13 +4,6 @@ const { EmbedBuilder } = require("discord.js");
 const username = process.env.USERNAME || "Dreama";
 const footer = process.env.FOOTER || "Dreama";
 
-const stopEmbed = new EmbedBuilder()
-    .setColor(COLORS.SUCCESS)
-    .setTitle("⏹️ Stopped")
-    .setDescription("Playback has been stopped, the queue has been cleared, and I have disconnected.")
-    .setFooter({ text: footer })
-    .setTimestamp();
-
 const errorEmbed1 = new EmbedBuilder()
     .setColor("FF0000")
     .setTitle("Error")
