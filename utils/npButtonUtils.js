@@ -51,14 +51,7 @@ function buildNpRow(player) {
         .setLabel(autoplay ? "🔀 Autoplay: On" : "🔀 Autoplay: Off")
         .setStyle(autoplay ? ButtonStyle.Success : ButtonStyle.Secondary);
 
-    return new ActionRowBuilder()
-        .addComponents(
-            pauseResumeBtn, 
-            skipBtn, 
-            stopBtn, 
-            repeatBtn, 
-            autoplayBtn
-        );
+    return new ActionRowBuilder().addComponents(pauseResumeBtn, skipBtn, stopBtn, repeatBtn, autoplayBtn);
 }
 
 function buildDisabledNpRow() {
@@ -92,7 +85,14 @@ function buildDisabledNpRow() {
         .setStyle(ButtonStyle.Secondary)
         .setDisabled(true);
 
-    return new ActionRowBuilder().addComponents(pauseResumeBtn, skipBtn, stopBtn, repeatBtn, autoplayBtn);
+    return new ActionRowBuilder()
+        .addComponents(
+            pauseResumeBtn, 
+            skipBtn, 
+            stopBtn, 
+            repeatBtn, 
+            autoplayBtn
+        );
 }
 
 async function syncNpMessage(player) {
@@ -144,7 +144,7 @@ async function handleNpButton(interaction, client) {
                         .setFooter({ text: footer })
                         .setTimestamp(),
                 ],
-                flags: MessageFlags.Ephemeral
+                flags: MessageFlags.Ephemeral,
             });
         }
 
@@ -180,9 +180,28 @@ async function handleNpButton(interaction, client) {
 
     if (id === "np_autoplay") {
         const current = player.get("autoplay") ?? false;
-        player.set("autoplay", !current);
-        return interaction.update({ components: [buildNpRow(player)] });
+        const newAutoplay = !current;
+        player.set("autoplay", newAutoplay);
+
+        const currentEmbed = interaction.message.embeds[0];
+        const updatedEmbed = EmbedBuilder.from(currentEmbed);
+        const fields = updatedEmbed.data.fields ?? [];
+        const autoplayIndex = fields.findIndex(f => f.name === "Autoplay");
+
+        if (autoplayIndex !== -1) {
+            updatedEmbed.spliceFields(autoplayIndex, 1, {
+                name:   "Autoplay",
+                value:  newAutoplay ? "🔀 On" : "Off",
+                inline: true,
+            });
+        }
+
+        return interaction.update({
+            embeds:     [updatedEmbed],
+            components: [buildNpRow(player)],
+        });
     }
 }
 
 module.exports = { buildNpRow, buildDisabledNpRow, syncNpMessage, handleNpButton };
+    
