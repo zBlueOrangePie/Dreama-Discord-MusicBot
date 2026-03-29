@@ -7,7 +7,7 @@
 ## 🚀 Features
 
 - **🔍 Supports YouTube, SoundCloud, Spotify, Deezer, Bandcamp, and direct url links**
-> ‼️ To accept urls, you must have a running plugin called lava-source plugin in your lavalink server.
+> ‼️ To accept urls, you must have a running plugin called **[LavaSrc](https://github.com/topi314/LavaSrc)** plugin in your lavalink server.
 - **🎛️ Filters**
 - **📋 Advanced Queue**
 - **🔍 Song Searching**
