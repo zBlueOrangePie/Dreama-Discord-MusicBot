@@ -1,5 +1,6 @@
 require("dotenv").config();
 const { SlashCommandBuilder, EmbedBuilder, MessageFlags } = require("discord.js");
+const { buildDisabledNpRow } = require("../../utils/npButtonUtils.js");
 
 const COLORS = {
     DEFAULT: "5865F2",
@@ -64,6 +65,12 @@ module.exports = {
         }
 
         player.set("manualStop", true);
+
+        if (player.npMessage) {
+            await player.npMessage.edit({ components: [buildDisabledNpRow()] }).catch(() => null);
+            player.npMessage = null;
+        }
+
         await player.stopPlaying(true, false);
         await player.destroy();
 
