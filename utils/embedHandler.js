@@ -39,4 +39,4 @@ const helpEmbed = new EmbedBuilder()
     .setFooter({ text: footer })
     .setTimestamp();
 
-module.exports = { stopEmbed, errorEmbed1, errorEmbed2, helpEmbed };
+module.exports = { errorEmbed1, errorEmbed2, helpEmbed };
