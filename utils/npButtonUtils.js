@@ -157,7 +157,18 @@ async function handleNpButton(interaction, client) {
         player.set("manualStop", true);
         await player.stopPlaying(true, false);
         await player.destroy();
-        return interaction.update({ components: [buildDisabledNpRow()] });
+        await interaction.update({ components: [buildDisabledNpRow()] });
+        return interaction.followUp({
+            embeds: [
+                new EmbedBuilder()
+                    .setColor("50C878")
+                    .setTitle("⏹️ Stopped")
+                    .setDescription("Playback has been stopped, the queue has been cleared, and I have disconnected.")
+                    .setFooter({ text: footer })
+                    .setTimestamp(),
+            ],
+            flags: MessageFlags.Ephemeral,
+        });
     }
 
     if (id === "np_repeat") {
