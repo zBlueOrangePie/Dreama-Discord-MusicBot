@@ -2,20 +2,23 @@
 
 🎶 A Discord music bot built with [discord.js v14](https://discord.js.org/) and [lavalink-client](https://github.com/Tomato6966/lavalink-client), powered by a Lavalink v4 audio server.
 
-‼️ This **code** was close to the documentation of **[lavalink-client](https://tomato6966.github.io/lavalink-client).** Please always give credits to **@zBlueOrangePie** when using this code.
+> ‼️ This **code** was close to the documentation of **[lavalink-client](https://tomato6966.github.io/lavalink-client).** Everything is easy to understand. Please always give credits to **@zBlueOrangePie** when using this code.
 
 ## 🚀 Features
 
-- **🔗 Supports YouTube and SoundCloud Searches/Queries**
+- **🔍 Supports YouTube, SoundCloud, Spotify, Deezer, Bandcamp, and direct url links**
+> ‼️ To accept urls, you must have a running plugin called lava-source plugin in your lavalink server.
 - **🎛️ Filters**
 - **📋 Advanced Queue**
 - **🔍 Song Searching**
 - **💪 Easy to host**
 - **🎶 Music with controllable buttons**
 - **✨ Music Cards**
-- **🤖 Autoplay/recommendations music**
+- **🤖 Autoplay/music recommendations**
+- **📋 Error Logging And Handling for nonstop music action!**
+- **❌ No database needed**
 
-## 🤯 Example of the nowplaying image card!
+## 🤯 Preview of the image cards!!
 
 ![👀 Previews!](/assets/nowplaying-3.png)
 
@@ -53,7 +56,7 @@ Copy the example env file and fill in your values:
 cp .envExample .env
 ```
 
-Then open `.env` and configure each field:
+> Then open `.env` and configure each field:
 
 ```env
 TOKEN= # Your Discord bot token
@@ -88,7 +91,7 @@ node deploy-cmds.js
 
 ## ‼️ Deleting Slash Commands
 
-The code already has a configured file that deletes all global slash commands use this in your terminal to delete all global slash commands
+> ⁉️ The code already has a configured file that deletes all global slash commands. Use this in your terminal to delete all global slash commands
 
 ```bash
 node deleteCommands.js
@@ -107,9 +110,10 @@ node index.js
 ## ‼️ Notes
 
 - The bot requires the **Server Members Intent** and **Message Content Intent** to be enabled in the Discord Developer Portal under your bot's settings.
+
 - Lavalink must be running and reachable before starting the bot, otherwise the node will fail to connect.
+
 - To add a new command, create a `.js` file inside any subfolder of `commands/`. It will be picked up automatically.
-- Also Checkout **[TicketByte](https://ticketbyte.bot.nu/)** and add it to your **server** for the best **ticket 🎟️** handling there is!
 
 ## ❔ Developer
 
