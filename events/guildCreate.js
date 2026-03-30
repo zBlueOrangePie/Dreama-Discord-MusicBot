@@ -1,5 +1,8 @@
 require("dotenv").config();
 const { Events, EmbedBuilder } = require('discord.js');
+const COLORS = {
+    DEFAULT: "FF7F50"
+};
 
 module.exports = {
     name: Events.GuildCreate,
@@ -32,7 +35,7 @@ module.exports = {
                  inline: false
             }
        )
-                .setColor(0x00FF00)
+                .setColor(COLORS.DEFAULT)
                 .setFooter({ text: footer })
                 .setTimestamp();
 
