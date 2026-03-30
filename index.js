@@ -5,7 +5,6 @@ const { Client, Collection, GatewayIntentBits, ActivityType, EmbedBuilder, Attac
 const fs = require("fs");
 const path = require("path");
 
-const { app } = require("./web/server.js");
 const { loadCommands } = require("./utils/loadCommands.js");
 const { logger } = require("./utils/logger.js");
 const { formatDuration } = require("./utils/formatDuration.js");
@@ -390,8 +389,6 @@ client.once("clientReady", () => {
     console.log(`[Bot] ✅ Logged in as ${client.user.tag}!`);
     console.log(`[Bot] ✅ Now watching ${client.guilds.cache.size} server(s)!`);
     console.log(`[Bot] ✅ Watching ${client.users.cache.size} user(s)!`);
-    console.log(`[Info] 🚀 Also Checkout My Discord Bot - TicketByte!!! https://ticketbyte.bot.nu/`);
-    console.log(`[Info] 💪 Big Thanks also to orange0990 for helping me create this!`);
 
     client.user.setPresence({
         activities: [{ 
