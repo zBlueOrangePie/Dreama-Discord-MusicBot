@@ -15,7 +15,7 @@ const { buildNpImageCard } = require("./utils/npImageCard.js");
 const COLORS = {
     ERROR: "FF0000",
     SUCCESS: "50C878",
-    DEFAULT: "5865F2",
+    DEFAULT: "FF7F50",
 };
 
 process.on("uncaughtException", (error) => {
@@ -88,12 +88,16 @@ client.lavalink = new LavalinkManager({
     autoSkip: true,
     playerOptions: {
         defaultSearchPlatform: "ytmsearch",
-        defaultVolume: 75,
+        defaultVolume: 100,
+        clientBasedPositionUpdateInterval: 50,
+        applyVolumeAsFilter: false,
+        volumeDecrementer: 1,
+        useUnresolvedData: true,
         onDisconnect: {
             autoReconnect: true,
             destroyPlayer: false,
         },
-    },
+      },
     client: {
         id: process.env.CLIENT_ID,
         username: process.env.USERNAME || "Dreama",
@@ -292,10 +296,18 @@ client.lavalink.on("trackError", async (player, track, payload) => {
 
     const footer = process.env.FOOTER || "Dreama";
 
+    const sourceName = track.info.sourceName ?? "unknown";
+    const pluginRequiredSources = ["deezer", "applemusic", "tidal", "spotify"];
+    const isUnsupportedSource = pluginRequiredSources.includes(sourceName.toLowerCase());
+
+    const description = isUnsupportedSource
+        ? `**[${track.info.title}](${track.info.uri})** could not be streamed.\n\n**${sourceName.charAt(0).toUpperCase() + sourceName.slice(1)}** requires a Lavalink source plugin to stream audio. Please contact your bot administrator to install it on the Lavalink server.`
+        : `An error occurred while playing **[${track.info.title}](${track.info.uri})** and it was skipped.`;
+
     const errorEmbed = new EmbedBuilder()
         .setColor(COLORS.ERROR)
         .setTitle("❌ Track Error")
-        .setDescription(`An error occurred while playing **[${track.info.title}](${track.info.uri})** and it was skipped.`)
+        .setDescription(description)
         .setFooter({ text: footer })
         .setTimestamp();
 
@@ -404,4 +416,4 @@ client.once("clientReady", () => {
 });
 
 client.login(process.env.TOKEN);
-            
+                
