@@ -101,10 +101,17 @@ node deleteCommands.js
 
 ## 🟢 Running the Bot
 
+- **Without Sharding**
+
 ```bash
 node index.js
 ```
 
+- **With Sharding**
+
+```bash
+node shard.js
+```
 ---
 
 ## ‼️ Notes
