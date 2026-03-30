@@ -2,7 +2,7 @@ const { createCanvas, loadImage } = require("@napi-rs/canvas");
 const path = require("path");
 
 const CARD_W = 900;
-const CARD_H = 620;
+const CARD_H = 640;
 const BG_PATH = path.join(__dirname, "../assets/background.jpeg");
 
 function fitTextToWidth(ctx, text, maxWidth, startSize, minSize) {
@@ -34,17 +34,17 @@ async function buildSearchCard(tracks, query) {
     ctx.fillRect(0, 0, CARD_W, CARD_H);
 
     const accentGrad = ctx.createLinearGradient(0, 0, 0, CARD_H);
-    accentGrad.addColorStop(0, "#8b5cf6");
-    accentGrad.addColorStop(1, "#3b82f6");
+    accentGrad.addColorStop(0, "#FF7F50");
+    accentGrad.addColorStop(1, "#FF5F1F");
     ctx.fillStyle = accentGrad;
     ctx.fillRect(0, 0, 5, CARD_H);
 
-    const padLeft = 44;
+    const padLeft = 24;
     const padRight = 36;
     const innerW = CARD_W - padLeft - padRight;
 
-    ctx.fillStyle = "rgba(167, 139, 250, 0.85)";
-    ctx.font = "bold 13px sans-serif";
+    ctx.fillStyle = "rgba(255, 0, 56)";
+    ctx.font = "bold 15px oswald";
     ctx.fillText("SEARCH RESULTS", padLeft, 44);
 
     const querySize = fitTextToWidth(ctx, `"${query}"`, innerW, 22, 12);
@@ -52,18 +52,29 @@ async function buildSearchCard(tracks, query) {
     ctx.fillStyle = "#ffffff";
     ctx.fillText(`"${query}"`, padLeft, 76);
 
-    ctx.strokeStyle = "rgba(139, 92, 246, 0.35)";
+    ctx.strokeStyle = "rgba(255, 0, 56)";
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(padLeft, 92);
     ctx.lineTo(CARD_W - padRight, 92);
     ctx.stroke();
 
-    const rowH = 96;
+    const artworks = await Promise.allSettled(
+        tracks.slice(0, 5).map(t =>
+            typeof t.info.artworkUrl === "string" && t.info.artworkUrl.startsWith("http")
+                ? loadImage(t.info.artworkUrl).catch(() => null)
+                : Promise.resolve(null)
+        )
+    );
+
+    const rowH = 100;
     const rowStartY = 100;
-    const numColW = 44;
+    const numColW = 36;
+    const thumbSize = 72;
+    const thumbGap = 14;
     const durColW = 90;
-    const textColW = innerW - numColW - durColW - 16;
+    const textX = padLeft + numColW + thumbSize + thumbGap;
+    const textColW = CARD_W - textX - durColW - padRight - 8;
 
     for (let i = 0; i < Math.min(tracks.length, 5); i++) {
         const track = tracks[i];
@@ -75,24 +86,46 @@ async function buildSearchCard(tracks, query) {
             ctx.fillRect(padLeft - 8, rowY + 4, CARD_W - padLeft - padRight + 16, rowH - 8);
         }
 
-        ctx.fillStyle = "rgba(139, 92, 246, 0.9)";
+        ctx.fillStyle = "rgba(255, 0, 56)";
         ctx.font = "bold 20px sans-serif";
         ctx.fillText(`${i + 1}`, padLeft, centerY + 7);
 
-        const titleX = padLeft + numColW;
-        const titleMaxW = textColW;
-        const titleSize = fitTextToWidth(ctx, track.info.title, titleMaxW, 17, 10);
+        const thumbX = padLeft + numColW;
+        const thumbY = centerY - thumbSize / 2;
+        const artwork = artworks[i]?.status === "fulfilled" ? artworks[i].value : null;
+
+        if (artwork) {
+            ctx.save();
+            ctx.beginPath();
+            ctx.roundRect(thumbX, thumbY, thumbSize, thumbSize, 8);
+            ctx.closePath();
+            ctx.clip();
+            ctx.drawImage(artwork, thumbX, thumbY, thumbSize, thumbSize);
+            ctx.restore();
+        } else {
+            ctx.fillStyle = "rgba(139, 92, 246, 0.15)";
+            ctx.beginPath();
+            ctx.roundRect(thumbX, thumbY, thumbSize, thumbSize, 8);
+            ctx.fill();
+
+            ctx.fillStyle = "rgba(139, 92, 246, 0.50)";
+            ctx.font = "bold 30px sans-serif";
+            const noteW = ctx.measureText("♪").width;
+            ctx.fillText("♪", thumbX + (thumbSize - noteW) / 2, thumbY + thumbSize / 2 + 11);
+        }
+
+        const titleSize = fitTextToWidth(ctx, track.info.title, textColW, 17, 10);
         ctx.font = `bold ${titleSize}px sans-serif`;
         ctx.fillStyle = "#ffffff";
-        ctx.fillText(track.info.title, titleX, centerY - 4);
+        ctx.fillText(track.info.title, textX, centerY - 4);
 
-        const authorSize  = fitTextToWidth(ctx, track.info.author, titleMaxW, 13, 9);
+        const authorSize = fitTextToWidth(ctx, track.info.author, textColW, 13, 9);
         ctx.font = `${authorSize}px sans-serif`;
         ctx.fillStyle = "rgba(148, 163, 184, 0.8)";
-        ctx.fillText(track.info.author, titleX, centerY + 16);
+        ctx.fillText(track.info.author, textX, centerY + 16);
 
         const duration = formatMs(track.info.duration);
-        const durSize = fitTextToWidth(ctx, duration, durColW, 14, 10);
+        const durSize  = fitTextToWidth(ctx, duration, durColW, 14, 10);
         ctx.font = `${durSize}px sans-serif`;
         ctx.fillStyle = "rgba(100, 116, 139, 0.9)";
         const durX = CARD_W - padRight - ctx.measureText(duration).width;
