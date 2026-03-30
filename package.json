@@ -8,14 +8,14 @@
     "start": "node shard.js",
     "start:no-shard": "node index.js"
   },
-  "keywords": ["lavalink", "discord-bot", "music-bot", "discord-music-bot"],
+  "keywords": ["lavalink", "discord-bot", "music-bot", "discord-music-bot", "lavalink-music", "lavalink-v4"],
   "author": "zBlueOrangePie",
   "license": "Creative Commons Zero v1.0 Universal",
   "description": "A Discord music bot that uses lavalink for music streaming.",
   "dependencies": {
     "@napi-rs/canvas": "^0.1.97",
     "discord.js": "^14.25.1",
-    "dotenv": "^17.3.1",
+    "dotenv": "16.6.1",
     "lavalink-client": "^2.9.11",
     "path": "^0.12.7",
     "fs": "^0.0.1-security"
