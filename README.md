@@ -1,8 +1,8 @@
 # ✨ Dreama — Discord Music Bot
 
-🎶 A Discord music bot built with [discord.js v14](https://discord.js.org/) and [lavalink-client](https://github.com/Tomato6966/lavalink-client), powered by a Lavalink v4 audio server.
+🎶 A Discord music bot built with [discord.js v14](https://discord.js.org/) and [lavalink-client](https://github.com/Tomato6966/lavalink-client), powered by a ``Lavalink v4`` audio server.
 
-> ‼️ This **code** was close to the documentation of **[lavalink-client](https://tomato6966.github.io/lavalink-client).** Everything is easy to understand. Please always give credits to **@zBlueOrangePie** when using this code.
+> ‼️ This **code** was close to the documentation of **[lavalink-client](https://tomato6966.github.io/lavalink-client).** Everything is easy to understand. Please always give credits to __**@zBlueOrangePie**__ when using this code.
 
 ## 🚀 Features
 
@@ -109,6 +109,8 @@ node index.js
 
 - **With Sharding**
 
+> ‼️ When **sharding** is enabled, the bot will be split into multiple pieces. If **sharding** isn't turned on, it cannot join more than __2,000 servers.__
+
 ```bash
 node shard.js
 ```
@@ -120,7 +122,7 @@ node shard.js
 
 - Lavalink must be **running and reachable** before starting the bot, __otherwise the node will fail to connect.__
 
-> Lavalink should only be in **v4**. **v3** can still work, but due to depracation of the native **YouTube** source, you can experience blocking in other songs that requires **login** to play video or music that you **requested.** We recommend you to use youtube-source plugin.
+> Lavalink should only be in ``**v4**``. ``**v3**`` can still work, but due to depracation of the native **YouTube** source, you can experience blocking in other songs that requires **login** to play ``video or music`` that you **requested.** We recommend you to use youtube-source plugin.
 
 - To add a new command, create a `.js` file inside any subfolder of `commands/`. It will be picked up automatically.
 
