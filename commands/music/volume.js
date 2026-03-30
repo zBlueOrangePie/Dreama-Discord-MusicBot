@@ -91,22 +91,6 @@ module.exports = {
 
         await player.setVolume(level);
 
-        if (player.npMessage) {
-            const currentEmbed = player.npMessage.embeds[0];
-            const updatedEmbed = EmbedBuilder.from(currentEmbed);
-            const fields = updatedEmbed.data.fields ?? [];
-            const volumeIndex = fields.findIndex(f => f.name === "Volume");
-
-            if (volumeIndex !== -1) {
-                updatedEmbed.spliceFields(volumeIndex, 1, {
-                    name: "Volume",
-                    value: `🔊 ${level}%`,
-                    inline: true,
-                });
-                player.npMessage.edit({ embeds: [updatedEmbed] }).catch(() => null);
-            }
-        }
-
         const trackTitle = player.queue.current?.info?.title ?? null;
         const imageBuffer = await buildVolumeCard(level, trackTitle).catch(() => null);
         const imageAttachment = imageBuffer ? new AttachmentBuilder(imageBuffer, { name: "volume.png" }) : null;
@@ -128,3 +112,4 @@ module.exports = {
         return interaction.editReply(replyOptions);
     },
 };
+                                        
