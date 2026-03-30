@@ -26,8 +26,8 @@ async function buildNpImageCard(track) {
     ctx.fillRect(0, 0, CARD_W, CARD_H);
 
     const accentGrad = ctx.createLinearGradient(0, 0, 0, CARD_H);
-    accentGrad.addColorStop(0, "#8b5cf6");
-    accentGrad.addColorStop(1, "#3b82f6");
+    accentGrad.addColorStop(0, "#FF7F50");
+    accentGrad.addColorStop(1, "#FF5F1F");
 
     ctx.fillStyle = accentGrad;
     ctx.fillRect(0, 0, 5, CARD_H);
@@ -64,8 +64,8 @@ async function buildNpImageCard(track) {
 
     const maxTextWidth = CARD_W - textStart - 36;
 
-    ctx.fillStyle = "rgba(167, 139, 250, 0.85)";
-    ctx.font = "bold 13px sans-serif";
+    ctx.fillStyle = "rgba(255, 0, 56)";
+    ctx.font = "bold 16px oswald";
     ctx.fillText("NOW PLAYING", textStart, 68);
 
     ctx.fillStyle = "#ffffff";
@@ -92,7 +92,7 @@ async function buildNpImageCard(track) {
     ctx.stroke();
 
     ctx.fillStyle = "rgba(100, 116, 139, 0.8)";
-    ctx.font = "13px sans-serif";
+    ctx.font = "16px oswald";
     ctx.fillText("Dreama Music", textStart, 240);
 
     return canvas.toBuffer("image/png");
