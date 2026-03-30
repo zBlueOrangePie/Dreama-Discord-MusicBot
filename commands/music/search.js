@@ -3,6 +3,7 @@ const { SlashCommandBuilder, EmbedBuilder, AttachmentBuilder, MessageFlags } = r
 const { buildSearchCard } = require("../../utils/searchCard.js");
 const { storeSearchData, buildSearchRows, buildDisabledSearchRows } = require("../../utils/searchButtonUtils.js");
 const { logger } = require("../../utils/logger.js");
+const GuildConfig = require("../../utils/database/configDb.js");
 
 const COLORS = {
     DEFAULT: "FF7F50",
@@ -52,6 +53,21 @@ module.exports = {
                         .setColor(COLORS.ERROR)
                         .setTitle("‼️ I'm Already Playing!")
                         .setDescription(`❌ I'm already in <#${botVoiceChannel.id}>. Join that channel to use me.`)
+                        .setFooter({ text: footer })
+                        .setTimestamp(),
+                ],
+                flags: MessageFlags.Ephemeral,
+            });
+        }
+
+        const guildConfig = await GuildConfig.findOne({ guildId: guild.id });
+        if (guildConfig?.musicVoice && voiceChannel.id !== guildConfig.musicVoice) {
+            return interaction.reply({
+                embeds: [
+                    new EmbedBuilder()
+                        .setColor(COLORS.ERROR)
+                        .setTitle("‼️ Wrong Voice Channel!")
+                        .setDescription(`❌ Dreama is configured to only play music in <#${guildConfig.musicVoice}>. Please join that voice channel.`)
                         .setFooter({ text: footer })
                         .setTimestamp(),
                 ],
@@ -145,4 +161,3 @@ module.exports = {
         }, BUTTON_TIMEOUT_MS);
     },
 };
-    
