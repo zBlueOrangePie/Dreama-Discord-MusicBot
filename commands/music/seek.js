@@ -137,7 +137,7 @@ module.exports = {
                     new EmbedBuilder()
                         .setColor(COLORS.ERROR)
                         .setTitle("❌ Position Out of Range!")
-                        .setDescription(`The track is only **${formatDuration(trackDuration)}** long. Please seek within that range.`)
+                        .setDescription(`The track is only **${formatDuration(trackDuration)}** long. You extended too much!`)
                         .setFooter({ text: footer })
                         .setTimestamp(),
                 ],
@@ -151,7 +151,7 @@ module.exports = {
         return interaction.editReply({
             embeds: [
                 new EmbedBuilder()
-                    .setColor(COLORS.SUCCESS)
+                    .setColor(COLORS.DEFAULT)
                     .setTitle("⏩ Seeked")
                     .setDescription(`Jumped to **${formatDuration(positionMs)}** in **[${currentTrack.info.title}](${currentTrack.info.uri})**.`)
                     .setFooter({ text: footer })
