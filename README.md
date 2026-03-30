@@ -17,8 +17,8 @@
 - **🎶 Music with controllable buttons**
 - **✨ Music Cards**
 - **🤖 Autoplay/music recommendations**
-- **📋 Error Logging And Handling for nonstop music action!**
-- **❌ No database needed**
+- **📋 Error Logging And Handling for nonstop music action**
+- **⚒️ Admin Configurations**
 
 ## 🤯 Preview of the image cards!!
 
@@ -64,6 +64,7 @@ cp .envExample .env
 TOKEN= # Your Discord bot token
 CLIENT_ID= # Your Discord application/client ID
 USERNAME= # Your bot's display name
+MONGODB_URI= # Your mongodb for storing database (like configurations and recent songs)
 
 LAVA_HOST= # Hostname or IP of your Lavalink server (e.g. localhost)
 LAVA_PORT= # Port your Lavalink server listens on (e.g. 2333)
