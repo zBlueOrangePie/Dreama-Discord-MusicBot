@@ -37,7 +37,7 @@ module.exports = {
                     new EmbedBuilder()
                         .setColor(COLORS.ERROR)
                         .setTitle("‼️ Please Join A Voice Channel First!")
-                        .setDescription("❌ You need to be in a voice channel to use this command.")
+                        .setDescription("You need to be in a voice channel to use this command.")
                         .setFooter({ text: footer })
                         .setTimestamp(),
                 ],
@@ -52,7 +52,7 @@ module.exports = {
                     new EmbedBuilder()
                         .setColor(COLORS.ERROR)
                         .setTitle("‼️ I'm Already Playing!")
-                        .setDescription(`❌ I'm already in <#${botVoiceChannel.id}>. Join that channel to use me.`)
+                        .setDescription(`I'm already in <#${botVoiceChannel.id}>. Join that channel to use me.`)
                         .setFooter({ text: footer })
                         .setTimestamp(),
                 ],
@@ -67,7 +67,7 @@ module.exports = {
                     new EmbedBuilder()
                         .setColor(COLORS.ERROR)
                         .setTitle("‼️ Wrong Voice Channel!")
-                        .setDescription(`❌ Dreama is configured to only play music in <#${guildConfig.musicVoice}>. Please join that voice channel.`)
+                        .setDescription(`Dreama is configured to only play music in <#${guildConfig.musicVoice}>. Please join that voice channel.`)
                         .setFooter({ text: footer })
                         .setTimestamp(),
                 ],
@@ -81,7 +81,7 @@ module.exports = {
                     new EmbedBuilder()
                         .setColor(COLORS.ERROR)
                         .setTitle("❌ Internal Error Occurred.")
-                        .setDescription("❌ No music nodes are available right now. Please try again later.")
+                        .setDescription("No music nodes are available right now. Please try again later.")
                         .setFooter({ text: footer })
                         .setTimestamp(),
                 ],
@@ -139,7 +139,7 @@ module.exports = {
         const searchEmbed = new EmbedBuilder()
             .setColor(COLORS.DEFAULT)
             .setTitle("🔍 Search Results")
-            .setDescription(`Showing **${tracks.length}** result(s) for **${query}**.\nSelect a song below or click **Play All** to queue everything.\n\n⏳ These buttons will expire in **5 minutes**.`)
+            .setDescription(`Showing **${tracks.length}** result(s) for **${query}**.\nSelect a song below or click **Play All** to queue everything and click **Cancel** when you want to cancel the search.\n\n⏳ These buttons will expire in **5 minutes**.`)
             .setFooter({ text: footer })
             .setTimestamp();
 
