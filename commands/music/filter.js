@@ -4,13 +4,13 @@ const { SlashCommandBuilder, EmbedBuilder, MessageFlags } = require("discord.js"
 const COLORS = {
     DEFAULT: "FF7F50",
     SUCCESS: "50C878",
-    ERROR:   "FF0000",
+    ERROR: "FF0000",
 };
 
 const FILTER_PRESETS = {
     bassboost: {
-        label : "🔊 Bass Boost",
-        apply : async (player) => {
+        label: "🔊 Bass Boost",
+        apply: async (player) => {
             await player.filterManager.toggleEqualizer([
                 { 
                     band: 0, 
