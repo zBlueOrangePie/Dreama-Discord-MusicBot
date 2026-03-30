@@ -30,13 +30,18 @@ function buildHelpEmbed(client) {
         )
         .addFields(
             {
-                name: "Music Commands",
-                value: "**/play**, **/stop**, **/pause**, **/resume**, **/queue**, **/filters**, **/autoplay**, **/volume**, **/search**, **/skip**, **/seek**, **/skipto**",
+                name: "🎶 Music Commands",
+                value: "**/play**, **/stop**, **/pause**, **/resume**, **/queue**, **/filters**, **/autoplay**, **/volume**, **/search**, **/skip**, **/seek**, **/skipto**, **/recent**, **/rewind**, **/forward**",
                 inline: false,
             },
             {
-                name: "Utility Commands",
+                name: "⚙️ Utility Commands",
                 value: "**/help**, **/ping**, **/uptime**, **/avatar**",
+                inline: false,
+            },
+            {
+                name: "⚒️ Admin Commands",
+                value: "**/config**",
                 inline: false,
             }
         )
@@ -49,4 +54,3 @@ function buildHelpEmbed(client) {
 }
 
 module.exports = { errorEmbed1, errorEmbed2, buildHelpEmbed };
-            
