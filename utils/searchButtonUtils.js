@@ -36,7 +36,11 @@ function buildSearchRows(tracks) {
         new ButtonBuilder()
             .setCustomId("search_track_all")
             .setLabel("🎵 Play All")
-            .setStyle(ButtonStyle.Primary)
+            .setStyle(ButtonStyle.Primary),
+        new ButtonBuilder()
+            .setCustomId("search_cancel")
+            .setLabel("Cancel")
+            .setStyle(ButtonStyle.Danger)
     );
 
     return [trackRow, allRow];
@@ -65,6 +69,11 @@ function buildDisabledSearchRows(tracks) {
             .setCustomId("search_track_all")
             .setLabel("🎵 Play All")
             .setStyle(ButtonStyle.Primary)
+            .setDisabled(true),
+        new ButtonBuilder()
+            .setCustomId("search_cancel")
+            .setLabel("Cancel")
+            .setStyle(ButtonStyle.Danger)
             .setDisabled(true)
     );
 
@@ -82,7 +91,23 @@ async function handleSearchButton(interaction, client) {
         });
     }
 
-    const { tracks } = data;
+    const { tracks, query } = data;
+
+    if (interaction.customId === "search_cancel") {
+        await interaction.deferUpdate();
+        await interaction.editReply({ components: buildDisabledSearchRows(tracks) });
+        return interaction.followUp({
+            embeds: [
+                new EmbedBuilder()
+                    .setColor("ED4245")
+                    .setDescription(`Searching for **${query}** has been cancelled!`)
+                    .setFooter({ text: footer })
+                    .setTimestamp(),
+            ],
+            flags: MessageFlags.Ephemeral,
+        });
+    }
+
     const voiceChannel = interaction.member.voice?.channel;
 
     if (!voiceChannel) {
@@ -163,7 +188,7 @@ async function handleSearchButton(interaction, client) {
         await interaction.followUp({
             embeds: [
                 new EmbedBuilder()
-                    .setColor("5865F2")
+                    .setColor("FF7F50")
                     .setTitle("🎵 Added to Queue")
                     .setDescription(`**[${track.info.title}](${track.info.uri})**`)
                     .addFields(
@@ -177,6 +202,11 @@ async function handleSearchButton(interaction, client) {
                           value: formatDuration(track.info.duration), 
                           inline: true 
                         },
+                        {
+                          name: "Requested By",
+                          value: `${interaction.user}`,
+                          inline: true,
+                        }
                     )
                     .setFooter({ text: footer })
                     .setTimestamp(),
@@ -187,3 +217,4 @@ async function handleSearchButton(interaction, client) {
 }
 
 module.exports = { storeSearchData, getSearchData, buildSearchRows, buildDisabledSearchRows, handleSearchButton };
+         
