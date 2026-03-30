@@ -19,7 +19,7 @@ module.exports = {
                 .setDescription('Configure a specific setting.')
                 .addSubcommand(sub =>
                     sub
-                        .setName('musicchannel')
+                        .setName('channel')
                         .setDescription('Set the text channel where music commands can be used.')
                         .addChannelOption(option =>
                             option
@@ -31,7 +31,7 @@ module.exports = {
                 )
                 .addSubcommand(sub =>
                     sub
-                        .setName('musicvoice')
+                        .setName('voice')
                         .setDescription('Set the voice channel where Dreama can join and play music.')
                         .addChannelOption(option =>
                             option
