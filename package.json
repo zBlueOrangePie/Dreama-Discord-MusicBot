@@ -5,7 +5,8 @@
   "scripts": {
     "deployCommands": "node deploy-cmds.js",
     "deleteCommands": "node deleteCommands.js",
-    "start": "node index.js"
+    "start": "node shard.js",
+    "start:no-shard": "node index.js"
   },
   "keywords": ["lavalink", "discord-bot", "music-bot", "discord-music-bot"],
   "author": "zBlueOrangePie",
