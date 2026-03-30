@@ -1,4 +1,4 @@
-require('dotenv').config();
+require("dotenv").config();
 const { EmbedBuilder } = require("discord.js");
 
 const username = process.env.USERNAME || "Dreama";
@@ -17,26 +17,36 @@ const errorEmbed2 = new EmbedBuilder()
     .setDescription("Something went wrong. Please try again later.")
     .setFooter({ text: footer })
     .setTimestamp();
-    
-const helpEmbed = new EmbedBuilder()
-    .setColor("FF7F50")
-    .setTitle(`${username} - Command Information Guide`)
-    
-    .setDescription(`👋 Hi! Im ${username} and im ready to help you! All available commands can be found right here.\n\n` + 
-                    `${username} only uses slash commands **(/)**.`)
-    .addFields(
-     {
-     name: "Music Commands",
-     value: "**/play**, **/stop**, **/pause**, **/resume**, **/queue**, **/filters**, **/autoplay**, **/volume**, **/search**",
-     inline: false
-    },
-    {
-     name: "Utility Commands",
-     value: "**/help**, **/ping**, **/uptime**",
-     inline: false
-    }
-    )
-    .setFooter({ text: footer })
-    .setTimestamp();
 
-module.exports = { errorEmbed1, errorEmbed2, helpEmbed };
+function buildHelpEmbed(client) {
+    const avatarURL = client?.user?.displayAvatarURL({ dynamic: true, size: 256 }) ?? null;
+
+    const embed = new EmbedBuilder()
+        .setColor("FF7F50")
+        .setTitle(`${username} - Command Information Guide`)
+        .setDescription(
+            `👋 Hi! I'm ${username} and I'm ready to help you! All available commands can be found right here.\n\n` +
+            `${username} only uses slash commands **(/)**.`
+        )
+        .addFields(
+            {
+                name: "Music Commands",
+                value: "**/play**, **/stop**, **/pause**, **/resume**, **/queue**, **/filters**, **/autoplay**, **/volume**, **/search**, **/skip**, **/seek**, **/skipto**",
+                inline: false,
+            },
+            {
+                name: "Utility Commands",
+                value: "**/help**, **/ping**, **/uptime**, **/avatar**",
+                inline: false,
+            }
+        )
+        .setFooter({ text: footer })
+        .setTimestamp();
+
+    if (avatarURL) embed.setThumbnail(avatarURL);
+
+    return embed;
+}
+
+module.exports = { errorEmbed1, errorEmbed2, buildHelpEmbed };
+            
