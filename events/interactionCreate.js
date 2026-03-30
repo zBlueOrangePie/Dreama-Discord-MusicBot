@@ -25,7 +25,7 @@ module.exports = {
                 return handleQueueButton(interaction, client);
             }
 
-            if (id.startsWith(SEARCH_BUTTON_PREFIX) || id === "search_track_all") {
+            if (id.startsWith(SEARCH_BUTTON_PREFIX) || id === "search_track_all" || id === "search_cancel") {
                 return handleSearchButton(interaction, client);
             }
 
