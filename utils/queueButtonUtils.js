@@ -87,7 +87,7 @@ function buildQueueEmbed(player, page) {
     const totalDuration = tracks.reduce((acc, t) => acc + (t.info.duration || 0), 0);
 
     return new EmbedBuilder()
-        .setColor("5865F2")
+        .setColor("FF7F50")
         .setTitle("🎶 Current Queue")
         .addFields(
             {
