@@ -36,7 +36,7 @@ console.log(`
   ██████╔╝██║  ██║███████╗██║  ██║██║ ╚═╝ ██║██║  ██║
   ╚═════╝ ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝
 `);
-console.log(`[Bot] ‼️ Music Is Loading... Please wait!`);
+console.log(`[Bot] ‼️ Music And Database Is Initializing... Please wait!`);
 console.log(`[Info] ‼️ Created By: zBlueOrangePie. Github ---> https://github.com/zBlueOrangePie/Dreama-Discord-MusicBot`);
 console.log(`[Warning] ⚠️ You cannot claim that you own this code!!`);
 
@@ -186,13 +186,13 @@ client.lavalink.on("trackStart", async (player, track) => {
     clearTimer(player.guildId);
 
     RecentTrack.create({
-        guildId:     player.guildId,
-        title:       track.info.title,
-        uri:         track.info.uri,
-        author:      track.info.author       || "Unknown",
-        duration:    track.info.duration     || 0,
-        sourceName:  track.info.sourceName   || "unknown",
-        artworkUrl:  track.info.artworkUrl   || null,
+        guildId: player.guildId,
+        title: track.info.title,
+        uri: track.info.uri,
+        author: track.info.author       || "Unknown",
+        duration: track.info.duration     || 0,
+        sourceName: track.info.sourceName   || "unknown",
+        artworkUrl: track.info.artworkUrl   || null,
         requestedBy: track.requester?.username ?? "Unknown",
     }).catch((err) => logger.error("Failed to save recent track to database", err));
 
@@ -209,6 +209,7 @@ client.lavalink.on("trackStart", async (player, track) => {
     }
 
     const footer = process.env.FOOTER || "Dreama";
+    const username = process.env.USERNAME || "Dreama";
 
     const imageBuffer = await buildNpImageCard(track).catch(() => null);
     const imageAttachment = imageBuffer ? new AttachmentBuilder(imageBuffer, { name: "nowplaying.png" }) : null;
@@ -230,7 +231,7 @@ client.lavalink.on("trackStart", async (player, track) => {
             },
             { 
                 name: "Requested By", 
-                value: track.requester?.username ?? "Unknown",         
+                value: track.requester?.username ?? `${username} can't identify the user:<`,         
                 inline: true 
             },
             { 
@@ -343,7 +344,10 @@ client.lavalink.on("queueEnd", async (player) => {
 
         if (lastTrack) {
             const result = await player.search(
-                { query: `${lastTrack.info.title} ${lastTrack.info.author}`, source: "ytmsearch" },
+                { 
+                    query: `${lastTrack.info.title} ${lastTrack.info.author}`, 
+                    source: "ytmsearch" 
+                },
                 client.user,
             ).catch(() => null);
 
@@ -419,4 +423,3 @@ client.once("clientReady", () => {
 });
 
 client.login(process.env.TOKEN);
-                
