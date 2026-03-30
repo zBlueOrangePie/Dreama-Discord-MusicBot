@@ -1,12 +1,31 @@
-const { Events, MessageFlags } = require("discord.js");
+const { Events, MessageFlags, EmbedBuilder } = require("discord.js");
 const { errorEmbed1, errorEmbed2 } = require("../utils/embedHandler.js");
 const { handleNpButton } = require("../utils/npButtonUtils.js");
 const { handleQueueButton } = require("../utils/queueButtonUtils.js");
 const { handleSearchButton } = require("../utils/searchButtonUtils.js");
+const GuildConfig = require("../utils/database/configDb.js");
 
 const NP_BUTTON_IDS = ["np_pause_resume", "np_skip", "np_stop", "np_repeat", "np_autoplay"];
 const QUEUE_BUTTON_PREFIX = "queue_";
 const SEARCH_BUTTON_PREFIX = "search_track_";
+
+const MUSIC_COMMANDS = new Set([
+    "play", 
+    "stop", 
+    "pause", 
+    "resume", 
+    "queue", 
+    "filter",
+    "autoplay", 
+    "volume", 
+    "search", 
+    "skip", 
+    "seek", 
+    "skipto",
+    "recent", 
+    "rewind", 
+    "forward",
+]); //Checks this commands if they have configured music channel only.
 
 module.exports = {
     name: Events.InteractionCreate,
@@ -39,6 +58,30 @@ module.exports = {
         if (!command) {
             console.error(`[Commands] ❌ No command matching ${interaction.commandName} was found.`);
             return;
+        }
+
+        if (MUSIC_COMMANDS.has(interaction.commandName)) {
+            try {
+                const config = await GuildConfig.findOne({ guildId: interaction.guildId });
+
+                if (config?.musicChannel && interaction.channelId !== config.musicChannel) {
+                    const footer = process.env.FOOTER || "Dreama";
+
+                    return interaction.reply({
+                        embeds: [
+                            new EmbedBuilder()
+                                .setColor("FF0000")
+                                .setTitle("❌ Wrong Channel!")
+                                .setDescription(`Music commands can only be used in <#${config.musicChannel}>.`)
+                                .setFooter({ text: footer })
+                                .setTimestamp(),
+                        ],
+                        flags: MessageFlags.Ephemeral,
+                    });
+                }
+            } catch {
+                /* If the DB check fails, allow the command through rather than blocking the user */
+            }
         }
 
         try {
