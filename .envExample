@@ -1,7 +1,7 @@
 TOKEN= # Your Discord bot token
 CLIENT_ID= # Your Discord application/client ID
 USERNAME= # Your bot's display name
-MONGODB_URI= # Your mongodb for storing database (like configirations and recent songs)
+MONGODB_URI= # Your mongodb for storing database (like configurations and recent songs)
 
 LAVA_HOST= # Hostname or IP of your Lavalink server (e.g. localhost)
 LAVA_PORT= # Port your Lavalink server listens on (e.g. 2333)
