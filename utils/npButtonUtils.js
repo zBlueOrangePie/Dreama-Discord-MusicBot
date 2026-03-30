@@ -51,7 +51,13 @@ function buildNpRow(player) {
         .setLabel(autoplay ? "🔀 Autoplay: On" : "🔀 Autoplay: Off")
         .setStyle(autoplay ? ButtonStyle.Success : ButtonStyle.Secondary);
 
-    return new ActionRowBuilder().addComponents(pauseResumeBtn, skipBtn, stopBtn, repeatBtn, autoplayBtn);
+    return new ActionRowBuilder().addComponents(
+        pauseResumeBtn, 
+        skipBtn, 
+        stopBtn, 
+        repeatBtn, 
+        autoplayBtn
+    );
 }
 
 function buildDisabledNpRow() {
@@ -196,12 +202,28 @@ async function handleNpButton(interaction, client) {
             });
         }
 
-        return interaction.update({
-            embeds:     [updatedEmbed],
+        const updatePayload = {
+            embeds: [updatedEmbed],
             components: [buildNpRow(player)],
-        });
+        };
+
+        if (updatedEmbed.data.image?.url?.startsWith("attachment://")) {
+            const track = player.queue?.current;
+            const artworkUrl = track?.info?.artworkUrl;
+
+            if (typeof artworkUrl === "string" && artworkUrl.startsWith("http")) {
+                updatedEmbed.setImage(artworkUrl);
+            } else {
+                updatedEmbed.data.image = undefined;
+            }
+
+            updatePayload.attachments = [];
+        }
+
+        return interaction.update(updatePayload);
     }
 }
 
 module.exports = { buildNpRow, buildDisabledNpRow, syncNpMessage, handleNpButton };
-    
+
+            
