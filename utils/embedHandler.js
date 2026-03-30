@@ -19,7 +19,7 @@ const errorEmbed2 = new EmbedBuilder()
     .setTimestamp();
     
 const helpEmbed = new EmbedBuilder()
-    .setColor("5865F2")
+    .setColor("FF7F50")
     .setTitle(`${username} - Command Information Guide`)
     
     .setDescription(`👋 Hi! Im ${username} and im ready to help you! All available commands can be found right here.\n\n` + 
