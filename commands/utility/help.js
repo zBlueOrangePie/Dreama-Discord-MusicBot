@@ -1,12 +1,13 @@
-const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
-const { helpEmbed } = require("../../utils/embedHandler.js");
+const { SlashCommandBuilder } = require("discord.js");
+const { buildHelpEmbed } = require("../../utils/embedHandler.js");
 
 module.exports = {
-  data: new SlashCommandBuilder()
-  .setName("help")
-  .setDescription("Shows all available commands that can be used."),
+    data: new SlashCommandBuilder()
+        .setName("help")
+        .setDescription("Shows all available commands that can be used."),
 
-  async execute(interaction) {
-    interaction.reply({ embeds: [helpEmbed] });
-  }
-}
+    async execute(interaction) {
+        const embed = buildHelpEmbed(interaction.client);
+        return interaction.reply({ embeds: [embed] });
+    },
+};
