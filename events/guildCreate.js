@@ -20,7 +20,7 @@ module.exports = {
         }
 
         if (targetChannel) {
-            const thankYouEmbed = new EmbedBuilder()
+            const embed = new EmbedBuilder()
                 .setTitle('Thank you for inviting me!')
                 .setDescription(`Hello **${guild.name}**! I’m ${username} and im excited to be here! Use \`/help\` to see what I can do.`)
             .addFields(
@@ -39,7 +39,7 @@ module.exports = {
                 .setFooter({ text: footer })
                 .setTimestamp();
 
-            await targetChannel.send({ embeds: [thankYouEmbed] });
+            await targetChannel.send({ embeds: [embed] });
         } else {
             console.warn(`[Bot] ❌ Could not find a suitable channel to send the welcome message in ${guild.name}`);
         }
