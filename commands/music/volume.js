@@ -3,7 +3,7 @@ const { SlashCommandBuilder, EmbedBuilder, AttachmentBuilder, MessageFlags } = r
 const { buildVolumeCard } = require("../../utils/volumeCard.js");
 
 const COLORS = {
-    DEFAULT: "5865F2",
+    DEFAULT: "FF7F50",
     SUCCESS: "50C878",
     ERROR: "FF0000",
 };
