@@ -1,39 +1,23 @@
 require("dotenv").config();
 const { SlashCommandBuilder, EmbedBuilder, AttachmentBuilder, MessageFlags } = require("discord.js");
-const { buildSearchCard }                                  = require("../../utils/searchCard.js");
-const { storeSearchData, buildSearchRows }                 = require("../../utils/searchButtonUtils.js");
+const { buildSearchCard } = require("../../utils/searchCard.js");
+const { storeSearchData, buildSearchRows } = require("../../utils/searchButtonUtils.js");
+const { logger } = require("../../utils/logger.js");
 
 const COLORS = {
-    DEFAULT: "5865F2",
+    DEFAULT: "FF7F50",
     ERROR: "FF0000",
-};
-
-const SOURCE_MAP = {
-    soundcloud: "scsearch",
-    youtube: "ytsearch",
 };
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("search")
-        .setDescription("Search for songs and choose what to play.")
+        .setDescription("Search for songs and choose what you want to play.")
         .addStringOption(option =>
             option
                 .setName("query")
                 .setDescription("Song name to search for.")
                 .setRequired(true)
-        )
-        .addBooleanOption(option =>
-            option
-                .setName("soundcloud")
-                .setDescription("Search on SoundCloud.")
-                .setRequired(false)
-        )
-        .addBooleanOption(option =>
-            option
-                .setName("youtube")
-                .setDescription("Search on YouTube.")
-                .setRequired(false)
         ),
 
     async execute(interaction) {
@@ -42,16 +26,7 @@ module.exports = {
         const guild = interaction.guild;
         const voiceChannel = member.voice?.channel;
         const footer = process.env.FOOTER || "Dreama";
-
         const query = interaction.options.getString("query");
-        const useSC = interaction.options.getBoolean("soundcloud");
-        const useYT = interaction.options.getBoolean("youtube");
-
-        let source = "ytmsearch";
-        if (useSC) 
-          source = SOURCE_MAP.soundcloud;
-        else if (useYT) 
-          source = SOURCE_MAP.youtube;
 
         if (!voiceChannel) {
             return interaction.reply({
@@ -106,9 +81,24 @@ module.exports = {
         });
 
         if (!player.connected) 
-          await player.connect();
+            await player.connect();
 
-        const result = await player.search({ query, source }, interaction.user);
+        let result;
+        try {
+            result = await player.search({ query }, interaction.user);
+        } catch (err) {
+            logger.error("Search failed in /search", err);
+            return interaction.editReply({
+                embeds: [
+                    new EmbedBuilder()
+                        .setColor(COLORS.ERROR)
+                        .setTitle("❌ Search Failed")
+                        .setDescription(`Could not retrieve results for **${query}**. The source may be unavailable, unsupported, or rate-limited by the Lavalink server.`)
+                        .setFooter({ text: footer })
+                        .setTimestamp(),
+                ],
+            });
+        }
 
         if (!result?.tracks?.length || result.loadType === "empty" || result.loadType === "error") {
             return interaction.editReply({
@@ -128,26 +118,25 @@ module.exports = {
         const imageBuffer = await buildSearchCard(tracks, query).catch(() => null);
         const imageAttachment = imageBuffer ? new AttachmentBuilder(imageBuffer, { name: "search.png" }) : null;
 
-        const sourceLabel = useSC ? "SoundCloud" : useYT ? "YouTube" : "YouTube Music";
-
         const searchEmbed = new EmbedBuilder()
             .setColor(COLORS.DEFAULT)
             .setTitle("🔍 Search Results")
-            .setDescription(`Showing **${tracks.length}** result(s) for **${query}** on **${sourceLabel}**.\nSelect a song below or click **Play All** to queue everything.`)
+            .setDescription(`Showing **${tracks.length}** result(s) for **${query}**.\nSelect a song below or click **Play All** to queue everything.`)
             .setFooter({ text: footer })
             .setTimestamp();
 
         if (imageAttachment) 
-          searchEmbed.setImage("attachment://search.png");
+            searchEmbed.setImage("attachment://search.png");
 
         const rows = buildSearchRows(tracks);
 
         const sendOptions = { embeds: [searchEmbed], components: rows };
         if (imageAttachment) 
-          sendOptions.files = [imageAttachment];
+            sendOptions.files = [imageAttachment];
 
         const sentMessage = await interaction.editReply(sendOptions);
 
-        storeSearchData(sentMessage.id, { tracks, source });
+        storeSearchData(sentMessage.id, { tracks, query });
     },
 };
+            
