@@ -2,11 +2,13 @@
 
 🎶 A Discord music bot built with [discord.js v14](https://discord.js.org/) and [lavalink-client](https://github.com/Tomato6966/lavalink-client), powered by a ``Lavalink v4`` audio server.
 
+> [!TIP]
 > ‼️ This **code** was close to the documentation of **[lavalink-client](https://tomato6966.github.io/lavalink-client).** Everything is easy to understand. Please always give credits to __**@zBlueOrangePie**__ when using this code.
 
 ## 🚀 Features
 
 - **🔍 Supports YouTube, SoundCloud, Spotify, Deezer, Bandcamp, and direct url links**
+> [!WARNING]
 > ‼️ To accept urls, you must have a running plugin called **[LavaSrc](https://github.com/topi314/LavaSrc)** plugin in your lavalink server.
 - **🎛️ Filters**
 - **📋 Advanced Queue**
@@ -85,12 +87,16 @@ Before running the bot for the first time, register the slash commands with Disc
 
 This only needs to be run once, or again whenever you add or modify a command.
 
+> [!NOTE]
+> ‼️ There is no need to deploy slash commands manually as they are now alwayd auto deployed. Only do this if it doesnt deploy properly.
+
 ```bash
 node deploy-cmds.js
 ```
 
 ## ‼️ Deleting Slash Commands
 
+> [!NOTE]
 > ⁉️ The code already has a configured file that deletes all global slash commands. Use this in your terminal to delete all global slash commands
 
 ```bash
@@ -122,6 +128,7 @@ node shard.js
 
 - Lavalink must be **running and reachable** before starting the bot, __otherwise the node will fail to connect.__
 
+> [!WARNING]
 > Lavalink should only be in **v4**. **v3** can still work, but due to depracation of the native **YouTube** source, you can experience blocking in other songs that requires **login** to play **video or music that you requested.** We recommend you to use youtube-source plugin.
 
 - To add a new command, create a `.js` file inside any subfolder of `commands/`. It will be picked up automatically.
