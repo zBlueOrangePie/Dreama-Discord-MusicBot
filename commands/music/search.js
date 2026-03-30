@@ -1,13 +1,15 @@
 require("dotenv").config();
 const { SlashCommandBuilder, EmbedBuilder, AttachmentBuilder, MessageFlags } = require("discord.js");
 const { buildSearchCard } = require("../../utils/searchCard.js");
-const { storeSearchData, buildSearchRows } = require("../../utils/searchButtonUtils.js");
+const { storeSearchData, buildSearchRows, buildDisabledSearchRows } = require("../../utils/searchButtonUtils.js");
 const { logger } = require("../../utils/logger.js");
 
 const COLORS = {
     DEFAULT: "FF7F50",
     ERROR: "FF0000",
 };
+
+const BUTTON_TIMEOUT_MS = 5 * 60 * 1000;
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -80,7 +82,7 @@ module.exports = {
             selfDeaf: true,
         });
 
-        if (!player.connected) 
+        if (!player.connected)
             await player.connect();
 
         let result;
@@ -121,22 +123,26 @@ module.exports = {
         const searchEmbed = new EmbedBuilder()
             .setColor(COLORS.DEFAULT)
             .setTitle("🔍 Search Results")
-            .setDescription(`Showing **${tracks.length}** result(s) for **${query}**.\nSelect a song below or click **Play All** to queue everything.`)
+            .setDescription(`Showing **${tracks.length}** result(s) for **${query}**.\nSelect a song below or click **Play All** to queue everything.\n\n⏳ These buttons will expire in **5 minutes**.`)
             .setFooter({ text: footer })
             .setTimestamp();
 
-        if (imageAttachment) 
+        if (imageAttachment)
             searchEmbed.setImage("attachment://search.png");
 
         const rows = buildSearchRows(tracks);
 
         const sendOptions = { embeds: [searchEmbed], components: rows };
-        if (imageAttachment) 
+        if (imageAttachment)
             sendOptions.files = [imageAttachment];
 
         const sentMessage = await interaction.editReply(sendOptions);
 
         storeSearchData(sentMessage.id, { tracks, query });
+
+        setTimeout(async () => {
+            await sentMessage.edit({ components: buildDisabledSearchRows(tracks) }).catch(() => null);
+        }, BUTTON_TIMEOUT_MS);
     },
 };
-            
+    
