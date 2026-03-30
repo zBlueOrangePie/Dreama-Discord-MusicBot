@@ -1,10 +1,11 @@
 require("dotenv").config();
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, MessageFlags } = require("discord.js");
 const { formatDuration } = require("./formatDuration.js");
+const { syncNpMessage } = require("./npButtonUtils.js");
 
 const searchCache = new Map();
 
-const CACHE_TTL_MS = 10 * 60 * 1000;
+const CACHE_TTL_MS = 5 * 60 * 1000;
 
 function storeSearchData(messageId, data) {
     searchCache.set(messageId, data);
@@ -159,7 +160,11 @@ async function handleSearchButton(interaction, client) {
     if (customId === "search_track_all") {
         await player.queue.add(tracks);
 
-        if (!wasPlaying) await player.play();
+        if (!wasPlaying) {
+            await player.play();
+        } else {
+            await syncNpMessage(player);
+        }
 
         await interaction.followUp({
             embeds: [
@@ -170,7 +175,6 @@ async function handleSearchButton(interaction, client) {
                     .setFooter({ text: footer })
                     .setTimestamp(),
             ],
-            flags: MessageFlags.Ephemeral,
         });
         return;
     }
@@ -182,9 +186,11 @@ async function handleSearchButton(interaction, client) {
 
     await player.queue.add(track);
 
-    if (!wasPlaying) await player.play();
+    if (!wasPlaying) {
+        await player.play();
+    } else {
+        await syncNpMessage(player);
 
-    if (wasPlaying) {
         await interaction.followUp({
             embeds: [
                 new EmbedBuilder()
@@ -193,28 +199,27 @@ async function handleSearchButton(interaction, client) {
                     .setDescription(`**[${track.info.title}](${track.info.uri})**`)
                     .addFields(
                         { 
-                          name: "Author",   
-                          value: track.info.author || "Unknown",      
-                          inline: true 
+                            name: "Author",       
+                            value: track.info.author || "Unknown",      
+                            inline: true 
                         },
                         { 
-                          name: "Duration", 
-                          value: formatDuration(track.info.duration), 
-                          inline: true 
+                            name: "Duration",     
+                            value: formatDuration(track.info.duration), 
+                            inline: true 
                         },
-                        {
-                          name: "Requested By",
-                          value: `${interaction.user}`,
-                          inline: true,
+                        { 
+                            name: "Requested By", 
+                            value: `${interaction.user}`,               
+                            inline: true 
                         }
                     )
                     .setFooter({ text: footer })
                     .setTimestamp(),
             ],
-            flags: MessageFlags.Ephemeral,
         });
     }
 }
 
 module.exports = { storeSearchData, getSearchData, buildSearchRows, buildDisabledSearchRows, handleSearchButton };
-         
+        
