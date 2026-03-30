@@ -2,11 +2,12 @@ require("dotenv").config();
 const { SlashCommandBuilder, EmbedBuilder, MessageFlags } = require("discord.js");
 const { formatDuration } = require("../../utils/formatDuration.js");
 const { syncNpMessage } = require("../../utils/npButtonUtils.js");
+const { logger } = require("../../utils/logger.js");
 
 const COLORS = {
     DEFAULT: "5865F2",
     SUCCESS: "50C878",
-    ERROR: "FF0000",
+    ERROR: "FF7F50",
 };
 
 module.exports = {
@@ -82,7 +83,23 @@ module.exports = {
         if (!player.connected) await player.connect();
 
         const query = interaction.options.getString("query");
-        const result = await player.search({ query }, interaction.user);
+
+        let result;
+        try {
+            result = await player.search({ query }, interaction.user);
+        } catch (err) {
+            logger.error("Search failed in /play", err);
+            return interaction.editReply({
+                embeds: [
+                    new EmbedBuilder()
+                        .setColor(COLORS.ERROR)
+                        .setTitle("❌ Search Failed")
+                        .setDescription(`Could not retrieve results for **${query}**. The source may be unavailable, unsupported, or rate-limited by the Lavalink server.`)
+                        .setFooter({ text: footer })
+                        .setTimestamp(),
+                ],
+            });
+        }
 
         if (result.loadType === "empty" || !result.tracks.length) {
             return interaction.editReply({
@@ -152,8 +169,8 @@ module.exports = {
 
                 const addedEmbed = new EmbedBuilder()
                     .setColor(COLORS.DEFAULT)
-                    .setTitle("🎵 Added to Queue!")
-                    .setDescription(`**[${track.info.title}](${track.info.uri})**`)
+                    .setTitle("🎵 Song Has Been Added to Queue!")
+                    .setDescription(`Song Title: **[${track.info.title}](${track.info.uri})**`)
                     .addFields(
                         { 
                             name: "Author",       
@@ -185,3 +202,4 @@ module.exports = {
         if (!wasPlaying) await player.play();
     },
 };
+        
