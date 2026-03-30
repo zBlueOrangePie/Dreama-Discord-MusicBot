@@ -35,7 +35,7 @@
 ## ❔ Requirements
 
 - 🟢 **Node.js** v18 or higher
-- 🟢 A running **Lavalink v4** server ([setup guide](https://tomato6966.github.io/lavalink-client/home/setup-lavalink))
+- 🟢 A running **Lavalink v4** server ([setup guide](https://lavalink.dev/configuration/config/file))
 - 🟢 A **Discord Bot** application with the correct intents enabled
 
 ---
