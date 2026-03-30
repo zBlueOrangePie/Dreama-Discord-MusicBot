@@ -186,44 +186,9 @@ async function handleNpButton(interaction, client) {
 
     if (id === "np_autoplay") {
         const current = player.get("autoplay") ?? false;
-        const newAutoplay = !current;
-        player.set("autoplay", newAutoplay);
-
-        const currentEmbed = interaction.message.embeds[0];
-        const updatedEmbed = EmbedBuilder.from(currentEmbed);
-        const fields = updatedEmbed.data.fields ?? [];
-        const autoplayIndex = fields.findIndex(f => f.name === "Autoplay");
-
-        if (autoplayIndex !== -1) {
-            updatedEmbed.spliceFields(autoplayIndex, 1, {
-                name:   "Autoplay",
-                value:  newAutoplay ? "🔀 On" : "Off",
-                inline: true,
-            });
-        }
-
-        const updatePayload = {
-            embeds: [updatedEmbed],
-            components: [buildNpRow(player)],
-        };
-
-        if (updatedEmbed.data.image?.url?.startsWith("attachment://")) {
-            const track = player.queue?.current;
-            const artworkUrl = track?.info?.artworkUrl;
-
-            if (typeof artworkUrl === "string" && artworkUrl.startsWith("http")) {
-                updatedEmbed.setImage(artworkUrl);
-            } else {
-                updatedEmbed.data.image = undefined;
-            }
-
-            updatePayload.attachments = [];
-        }
-
-        return interaction.update(updatePayload);
+        player.set("autoplay", !current);
+        return interaction.update({ components: [buildNpRow(player)] });
     }
 }
 
 module.exports = { buildNpRow, buildDisabledNpRow, syncNpMessage, handleNpButton };
-
-            
