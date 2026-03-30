@@ -122,7 +122,7 @@ node shard.js
 
 - Lavalink must be **running and reachable** before starting the bot, __otherwise the node will fail to connect.__
 
-> Lavalink should only be in ``**v4**``. ``**v3**`` can still work, but due to depracation of the native **YouTube** source, you can experience blocking in other songs that requires **login** to play ``video or music`` that you **requested.** We recommend you to use youtube-source plugin.
+> Lavalink should only be in **v4**. **v3** can still work, but due to depracation of the native **YouTube** source, you can experience blocking in other songs that requires **login** to play **video or music that you requested.** We recommend you to use youtube-source plugin.
 
 - To add a new command, create a `.js` file inside any subfolder of `commands/`. It will be picked up automatically.
 
