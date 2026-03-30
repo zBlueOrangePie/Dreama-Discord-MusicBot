@@ -3,7 +3,7 @@ const { SlashCommandBuilder, EmbedBuilder, MessageFlags } = require("discord.js"
 const { buildDisabledNpRow } = require("../../utils/npButtonUtils.js");
 
 const COLORS = {
-    DEFAULT: "5865F2",
+    DEFAULT: "FF7F50",
     SUCCESS: "50C878",
     ERROR: "FF0000",
 };
