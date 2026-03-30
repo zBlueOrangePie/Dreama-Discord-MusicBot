@@ -26,16 +26,16 @@ async function buildVolumeCard(volume, trackTitle) {
     ctx.fillRect(0, 0, CARD_W, CARD_H);
 
     const accentGrad = ctx.createLinearGradient(0, 0, 0, CARD_H);
-    accentGrad.addColorStop(0, "#8b5cf6");
-    accentGrad.addColorStop(1, "#3b82f6");
+    accentGrad.addColorStop(0, "#FF7F50");
+    accentGrad.addColorStop(1, "#FF5F1F");
     ctx.fillStyle = accentGrad;
     ctx.fillRect(0, 0, 5, CARD_H);
 
     const textStart = 44;
     const maxTextWidth = CARD_W - textStart - 36;
 
-    ctx.fillStyle = "rgba(167, 139, 250, 0.85)";
-    ctx.font = "bold 13px sans-serif";
+    ctx.fillStyle = "rgba(255, 0, 56)";
+    ctx.font = "bold 15px oswald";
     ctx.fillText("VOLUME UPDATED", textStart, 68);
 
     ctx.fillStyle = "#ffffff";
@@ -54,15 +54,15 @@ async function buildVolumeCard(volume, trackTitle) {
     ctx.fill();
 
     const barGrad = ctx.createLinearGradient(barX, 0, barX + barW, 0);
-    barGrad.addColorStop(0, "#8b5cf6");
-    barGrad.addColorStop(1, "#3b82f6");
+    barGrad.addColorStop(0, "#FF0038");
+    barGrad.addColorStop(1, "#FF7F50");
     ctx.fillStyle = barGrad;
     ctx.beginPath();
     ctx.roundRect(barX, barY, fillW, barH, 7);
     ctx.fill();
 
     if (trackTitle) {
-        ctx.strokeStyle = "rgba(139, 92, 246, 0.4)";
+        ctx.strokeStyle = "rgba(255, 0, 56)";
         ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.moveTo(textStart, 204);
@@ -75,7 +75,7 @@ async function buildVolumeCard(volume, trackTitle) {
         ctx.fillText(trackTitle, textStart, 230);
     }
 
-    ctx.fillStyle = "rgba(100, 116, 139, 0.8)";
+    ctx.fillStyle = "rgba(255, 0, 56)";
     ctx.font = "13px sans-serif";
     ctx.fillText("Dreama Music", textStart, 258);
 
