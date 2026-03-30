@@ -3,6 +3,7 @@ const { SlashCommandBuilder, EmbedBuilder, MessageFlags } = require("discord.js"
 const { formatDuration } = require("../../utils/formatDuration.js");
 const { syncNpMessage } = require("../../utils/npButtonUtils.js");
 const { logger } = require("../../utils/logger.js");
+const GuildConfig = require("../../utils/database/configDb.js");
 
 const COLORS = {
     DEFAULT: "5865F2",
@@ -34,7 +35,7 @@ module.exports = {
                     new EmbedBuilder()
                         .setColor(COLORS.ERROR)
                         .setTitle("‼️ Please Join A Voice Channel First!")
-                        .setDescription("❌ You need to be in a voice channel to use this command.")
+                        .setDescription("Dreama says that you need to be in a voice channel to use this command.")
                         .setFooter({ text: footer })
                         .setTimestamp(),
                 ],
@@ -49,7 +50,22 @@ module.exports = {
                     new EmbedBuilder()
                         .setColor(COLORS.ERROR)
                         .setTitle("‼️ I'm Already Playing!")
-                        .setDescription(`❌ I'm already in <#${botVoiceChannel.id}>. Join that channel to use me.`)
+                        .setDescription(`I'm already in <#${botVoiceChannel.id}>. Join that channel to use me.`)
+                        .setFooter({ text: footer })
+                        .setTimestamp(),
+                ],
+                flags: MessageFlags.Ephemeral,
+            });
+        }
+
+        const guildConfig = await GuildConfig.findOne({ guildId: guild.id });
+        if (guildConfig?.musicVoice && voiceChannel.id !== guildConfig.musicVoice) {
+            return interaction.reply({
+                embeds: [
+                    new EmbedBuilder()
+                        .setColor(COLORS.ERROR)
+                        .setTitle("‼️ Wrong Voice Channel!")
+                        .setDescription(`Dreama is configured to only play music in <#${guildConfig.musicVoice}>. Please join that voice channel.`)
                         .setFooter({ text: footer })
                         .setTimestamp(),
                 ],
@@ -63,7 +79,7 @@ module.exports = {
                     new EmbedBuilder()
                         .setColor(COLORS.ERROR)
                         .setTitle("❌ Internal Error Occurred.")
-                        .setDescription("❌ No music nodes are available right now. Please try again later.")
+                        .setDescription("No music nodes are available right now. Please try again later.")
                         .setFooter({ text: footer })
                         .setTimestamp(),
                 ],
@@ -202,4 +218,3 @@ module.exports = {
         if (!wasPlaying) await player.play();
     },
 };
-        
