@@ -1,9 +1,9 @@
 require("dotenv").config();
 const { EmbedBuilder } = require("discord.js");
 
-const avatarURL = client?.user?.displayAvatarURL({ dynamic: true, size: 256 }) ?? null;
 const username = process.env.USERNAME || "Dreama";
 const footer = process.env.FOOTER || "Dreama";
+const avatarURL = client?.user?.displayAvatarURL({ dynamic: true, size: 256 });
 
 const errorEmbed1 = new EmbedBuilder()
     .setColor("FF0000")
