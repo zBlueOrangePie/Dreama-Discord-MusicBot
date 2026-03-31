@@ -32,7 +32,6 @@ module.exports = {
     name: Events.InteractionCreate,
 
     async execute(interaction) {
-        const avatarURL = client?.user?.displayAvatarURL({ dynamic: true, size: 256 }) ?? null;
         const client = interaction.client;
 
         if (interaction.isButton()) {
@@ -76,7 +75,6 @@ module.exports = {
                                 .setTitle("❌ Wrong Channel!")
                                 .setDescription(`Music commands can only be used in <#${config.musicChannel}>.`)
                                 .setFooter({ text: footer })
-                                .setThumbnail(avatarURL)
                                 .setTimestamp(),
                         ],
                         flags: MessageFlags.Ephemeral,
