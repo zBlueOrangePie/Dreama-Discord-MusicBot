@@ -83,6 +83,7 @@ function buildDisabledSearchRows(tracks) {
 
 async function handleSearchButton(interaction, client) {
     const footer = process.env.FOOTER || "Dreama";
+    const avatarURL = client?.user?.displayAvatarURL({ dynamic: true, size: 256 }) ?? null;
     const data = getSearchData(interaction.message.id);
 
     if (!data) {
@@ -101,8 +102,10 @@ async function handleSearchButton(interaction, client) {
             embeds: [
                 new EmbedBuilder()
                     .setColor("ED4245")
+                    .setTitle("🔍 Searching...")
                     .setDescription(`Searching for **${query}** has been cancelled!`)
                     .setFooter({ text: footer })
+                    .setThumbnail(avatarURL)
                     .setTimestamp(),
             ],
             flags: MessageFlags.Ephemeral,
@@ -117,8 +120,9 @@ async function handleSearchButton(interaction, client) {
                 new EmbedBuilder()
                     .setColor("FF0000")
                     .setTitle("‼️ Please Join A Voice Channel First!")
-                    .setDescription("❌ You need to be in a voice channel to play music.")
+                    .setDescription("You need to be in a voice channel to play music.")
                     .setFooter({ text: footer })
+                    .setThumbnail(avatarURL)
                     .setTimestamp(),
             ],
             flags: MessageFlags.Ephemeral,
@@ -132,8 +136,9 @@ async function handleSearchButton(interaction, client) {
                 new EmbedBuilder()
                     .setColor("FF0000")
                     .setTitle("‼️ I'm Already Playing!")
-                    .setDescription(`❌ I'm already in <#${botVoiceChannel.id}>. Join that channel to use me.`)
+                    .setDescription(`I'm already in <#${botVoiceChannel.id}>. Join that channel to use me.`)
                     .setFooter({ text: footer })
+                    .setThumbnail(avatarURL)
                     .setTimestamp(),
             ],
             flags: MessageFlags.Ephemeral,
@@ -173,6 +178,7 @@ async function handleSearchButton(interaction, client) {
                     .setTitle("🎵 Added All to Queue")
                     .setDescription(`Added **${tracks.length}** tracks to the queue.`)
                     .setFooter({ text: footer })
+                    .setThumbnail(avatarURL)
                     .setTimestamp(),
             ],
         });
