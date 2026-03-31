@@ -9,7 +9,6 @@ const errorEmbed1 = new EmbedBuilder()
     .setTitle("Error")
     .setDescription("An error occurred while executing this command.")
     .setFooter({ text: footer })
-    .setThumbnail(avatarURL)
     .setTimestamp();
 
 const errorEmbed2 = new EmbedBuilder()
@@ -17,7 +16,6 @@ const errorEmbed2 = new EmbedBuilder()
     .setTitle("Error")
     .setDescription("Something went wrong. Please try again later.")
     .setFooter({ text: footer })
-    .setThumbnail(avatarURL)
     .setTimestamp();
 
 function buildHelpEmbed(client) {
