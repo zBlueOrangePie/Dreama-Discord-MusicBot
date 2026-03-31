@@ -26,7 +26,6 @@ module.exports = {
         const guild = interaction.guild;
         const voiceChannel = member.voice?.channel;
         const footer = process.env.FOOTER || "Dreama";
-        const avatarURL = client?.user?.displayAvatarURL({ dynamic: true, size: 256 }) ?? null;
         const position = interaction.options.getInteger("position");
 
         if (!voiceChannel) {
@@ -37,7 +36,6 @@ module.exports = {
                         .setTitle("‼️ Please Join A Voice Channel First!")
                         .setDescription("You need to be in a voice channel to use this command.")
                         .setFooter({ text: footer })
-                        .setThumbnail(avatarURL)
                         .setTimestamp(),
                 ],
                 flags: MessageFlags.Ephemeral,
@@ -54,7 +52,6 @@ module.exports = {
                         .setTitle("❌ Nothing Is Playing!")
                         .setDescription("There is no active player in this server.")
                         .setFooter({ text: footer })
-                        .setThumbnail(avatarURL)
                         .setTimestamp(),
                 ],
                 flags: MessageFlags.Ephemeral,
@@ -69,7 +66,6 @@ module.exports = {
                         .setTitle("‼️ Wrong Voice Channel!")
                         .setDescription(`You must be in <#${player.voiceChannelId}> to control playback.`)
                         .setFooter({ text: footer })
-                        .setThumbnail(avatarURL)
                         .setTimestamp(),
                 ],
                 flags: MessageFlags.Ephemeral,
@@ -86,7 +82,6 @@ module.exports = {
                         .setTitle("❌ Queue Is Empty!")
                         .setDescription("There are no tracks in the queue to skip to.")
                         .setFooter({ text: footer })
-                        .setThumbnail(avatarURL)
                         .setTimestamp(),
                 ],
                 flags: MessageFlags.Ephemeral,
@@ -103,7 +98,6 @@ module.exports = {
                         .setTitle("❌ Position Out of Range!")
                         .setDescription(`The queue only has **${queueTracks.length}** track(s). Please choose a position between **1** and **${queueTracks.length}**.`)
                         .setFooter({ text: footer })
-                        .setThumbnail(avatarURL)
                         .setTimestamp(),
                 ],
                 flags: MessageFlags.Ephemeral,
@@ -138,7 +132,6 @@ module.exports = {
                         }
                     )
                     .setFooter({ text: footer })
-                    .setThumbnail(avatarURL)
                     .setTimestamp(),
             ],
         });
