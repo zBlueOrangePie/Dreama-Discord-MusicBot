@@ -252,6 +252,7 @@ module.exports = {
         const guild = interaction.guild;
         const voiceChannel = member.voice?.channel;
         const footer = process.env.FOOTER || "Dreama";
+        const avatarURL = client?.user?.displayAvatarURL({ dynamic: true, size: 256 }) ?? null;
         const preset = interaction.options.getString("preset");
 
         if (!voiceChannel) {
@@ -260,8 +261,9 @@ module.exports = {
                     new EmbedBuilder()
                         .setColor(COLORS.ERROR)
                         .setTitle("‼️ Please Join A Voice Channel First!")
-                        .setDescription("❌ You need to be in a voice channel to use this command.")
+                        .setDescription("You need to be in a voice channel to use this command.")
                         .setFooter({ text: footer })
+                        .setThumbnail(avatarURL)
                         .setTimestamp(),
                 ],
                 flags: MessageFlags.Ephemeral,
@@ -278,6 +280,7 @@ module.exports = {
                         .setTitle("❌ Nothing Is Playing!")
                         .setDescription("There is no active player in this server.")
                         .setFooter({ text: footer })
+                        .setThumbnail(avatarURL)
                         .setTimestamp(),
                 ],
                 flags: MessageFlags.Ephemeral,
@@ -290,8 +293,9 @@ module.exports = {
                     new EmbedBuilder()
                         .setColor(COLORS.ERROR)
                         .setTitle("‼️ Wrong Voice Channel!")
-                        .setDescription(`❌ You must be in <#${player.voiceChannelId}> to control playback.`)
+                        .setDescription(`You must be in <#${player.voiceChannelId}> to control playback.`)
                         .setFooter({ text: footer })
+                        .setThumbnail(avatarURL)
                         .setTimestamp(),
                 ],
                 flags: MessageFlags.Ephemeral,
@@ -310,6 +314,7 @@ module.exports = {
                     .setTitle("🎛️ Filter Applied")
                     .setDescription(`Filter **${selected.label}** has been applied to the current playback.`)
                     .setFooter({ text: footer })
+                    .setThumbnail(avatarURL)
                     .setTimestamp(),
             ],
         });
