@@ -16,6 +16,7 @@ module.exports = {
     async execute(interaction) {
         const guild = interaction.guild;
         const footer = process.env.FOOTER || 'Dreama';
+        const avatarURL = client?.user?.displayAvatarURL({ dynamic: true, size: 256 }) ?? null;
 
         const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
 
@@ -32,6 +33,7 @@ module.exports = {
                         .setTitle('📭 No Recent Tracks')
                         .setDescription('No tracks have been played in the last hour.')
                         .setFooter({ text: footer })
+                        .setThumbnail(avatarURL)
                         .setTimestamp(),
                 ],
                 flags: MessageFlags.Ephemeral,
@@ -53,6 +55,7 @@ module.exports = {
                     .setTitle('🕐 Recently Played')
                     .setDescription(description)
                     .setFooter({ text: `${footer} • Showing the last ${tracks.length} track(s) within the hour` })
+                    .setThumbnail(avatarURL)
                     .setTimestamp(),
             ],
         });
