@@ -57,6 +57,7 @@ module.exports = {
         const guild = interaction.guild;
         const member = interaction.member;
         const footer = process.env.FOOTER || 'Dreama';
+        const avatarURL = client?.user?.displayAvatarURL({ dynamic: true, size: 256 }) ?? null;
 
         const hasPerms =
             member.permissions.has(PermissionFlagsBits.Administrator) ||
@@ -70,6 +71,7 @@ module.exports = {
                         .setTitle(`❌ Dreama Said You're Missing Permissions!`)
                         .setDescription('You need **Administrator** or **Manage Server** permissions to use this command.')
                         .setFooter({ text: footer })
+                        .setThumbnail(avatarURL)
                         .setTimestamp(),
                 ],
                 flags: MessageFlags.Ephemeral,
@@ -107,6 +109,7 @@ module.exports = {
                                     : 'Music commands can now be used in any channel. Dreama can be used on every channel!'
                             )
                             .setFooter({ text: footer })
+                            .setThumbnail(avatarURL)
                             .setTimestamp(),
                     ],
                 });
@@ -139,6 +142,7 @@ module.exports = {
                                     : 'Dreama can now join any voice channel. Dreama can be used on every voice channel!'
                             )
                             .setFooter({ text: footer })
+                            .setThumbnail(avatarURL)
                             .setTimestamp(),
                     ],
                 });
@@ -149,7 +153,7 @@ module.exports = {
             const config = await GuildConfig.findOne({ guildId: guild.id });
 
             const musicChannel = config?.musicChannel ? `<#${config.musicChannel}>` : 'None (all channels allowed)';
-            const musicVoice   = config?.musicVoice   ? `<#${config.musicVoice}>`   : 'None (all voice channels allowed)';
+            const musicVoice = config?.musicVoice   ? `<#${config.musicVoice}>`   : 'None (all voice channels allowed)';
 
             return interaction.reply({
                 embeds: [
@@ -169,6 +173,7 @@ module.exports = {
                             },
                         )
                         .setFooter({ text: `${footer} • More Settings Will Arrive Soon!` })
+                        .setThumbnail(avatarURL)
                         .setTimestamp(),
                 ],
             });
@@ -184,6 +189,7 @@ module.exports = {
                         .setTitle('🔄 Configuration Reset')
                         .setDescription('All settings have been reset to default and the saved configuration has been deleted.')
                         .setFooter({ text: footer })
+                        .setThumbnail(avatarURL)
                         .setTimestamp(),
                 ],
             });
