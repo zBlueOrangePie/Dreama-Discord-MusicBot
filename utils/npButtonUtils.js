@@ -139,7 +139,7 @@ async function handleNpButton(interaction, client) {
 
     if (id === "np_skip") {
         const hasNextTrack = (player.queue?.tracks?.length ?? 0) > 0;
-
+        
         if (!hasNextTrack) {
             return interaction.reply({
                 embeds: [
@@ -148,6 +148,7 @@ async function handleNpButton(interaction, client) {
                         .setTitle("❌ Cannot Skip!")
                         .setDescription("You can't use this when there is only one song in the current queue. Use **/play** to add more songs or **/stop** or click the stop button if you don't want to listen anymore.")
                         .setFooter({ text: footer })
+                        .setThumbnail(avatarURL)
                         .setTimestamp(),
                 ],
                 flags: MessageFlags.Ephemeral,
@@ -160,6 +161,7 @@ async function handleNpButton(interaction, client) {
     }
 
     if (id === "np_stop") {
+        const avatarURL = client?.user?.displayAvatarURL({ dynamic: true, size: 256 }) ?? null;
         player.set("manualStop", true);
         await player.stopPlaying(true, false);
         await player.destroy();
@@ -167,10 +169,11 @@ async function handleNpButton(interaction, client) {
         return interaction.followUp({
             embeds: [
                 new EmbedBuilder()
-                    .setColor("50C878")
+                    .setColor("FF7F50")
                     .setTitle("⏹️ Stopped")
                     .setDescription("Playback has been stopped, the queue has been cleared, and I have disconnected.")
                     .setFooter({ text: footer })
+                    .setThumbnail(avatarURL)
                     .setTimestamp(),
             ],
             flags: MessageFlags.Ephemeral,
