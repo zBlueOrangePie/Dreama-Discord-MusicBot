@@ -8,6 +8,7 @@ module.exports = {
     name: Events.GuildCreate,
     once: false,
     async execute(guild, client) {
+        const avatarURL = client?.user?.displayAvatarURL({ dynamic: true, size: 256 }) ?? null;
         const footer = process.env.FOOTER || "Dreama";
         const username = process.env.USERNAME || "Dreama";
         console.log(`[Bot] ✅ Joined new guild: ${guild.name} (Owner ID: ${guild.ownerId})`);
@@ -37,6 +38,7 @@ module.exports = {
        )
                 .setColor(COLORS.DEFAULT)
                 .setFooter({ text: footer })
+                .setThumbnail(avatarURL)
                 .setTimestamp();
 
             await targetChannel.send({ embeds: [embed] });
