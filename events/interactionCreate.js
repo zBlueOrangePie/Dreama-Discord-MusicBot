@@ -25,12 +25,14 @@ const MUSIC_COMMANDS = new Set([
     "recent", 
     "rewind", 
     "forward",
-]); //Checks this commands if they have configured music channel only.
+]); /*Checks this commands if they have configured music channel only.
+    This acts like a guard for these, they are loaded automatically. you can add more if you want.*/
 
 module.exports = {
     name: Events.InteractionCreate,
 
     async execute(interaction) {
+        const avatarURL = client?.user?.displayAvatarURL({ dynamic: true, size: 256 }) ?? null;
         const client = interaction.client;
 
         if (interaction.isButton()) {
@@ -74,6 +76,7 @@ module.exports = {
                                 .setTitle("❌ Wrong Channel!")
                                 .setDescription(`Music commands can only be used in <#${config.musicChannel}>.`)
                                 .setFooter({ text: footer })
+                                .setThumbnail(avatarURL)
                                 .setTimestamp(),
                         ],
                         flags: MessageFlags.Ephemeral,
