@@ -13,6 +13,7 @@ module.exports = {
         .setDescription("Check the bot's latency and API response time."),
 
     async execute(interaction) {
+        const avatarURL = client?.user?.displayAvatarURL({ dynamic: true, size: 256 }) ?? null;
         const footer = process.env.FOOTER || "Dreama";
 
         await interaction.deferReply();
@@ -25,10 +26,19 @@ module.exports = {
             .setColor(COLORS.DEFAULT)
             .setTitle("🏓 Pong!")
             .addFields(
-                { name: "API Latency",       value: `\`${apiPing}ms\``,  inline: true },
-                { name: "WebSocket Latency", value: `\`${wsPing}ms\``,   inline: true },
+                { 
+                    name: "🚀 API Latency",       
+                    value: `\`${apiPing}ms\``,  
+                    inline: true 
+                },
+                { 
+                    name: "🔗 WebSocket Latency", 
+                    value: `\`${wsPing}ms\``,   
+                    inline: true 
+                },
             )
             .setFooter({ text: footer })
+            .setThumbnail(avatarURL)
             .setTimestamp();
 
         await interaction.editReply({ embeds: [pingEmbed] });
