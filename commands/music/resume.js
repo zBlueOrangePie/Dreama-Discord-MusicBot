@@ -18,6 +18,7 @@ module.exports = {
         const member = interaction.member;
         const guild = interaction.guild;
         const voiceChannel = member.voice?.channel;
+        const avatarURL = client?.user?.displayAvatarURL({ dynamic: true, size: 256 }) ?? null;
         const footer = process.env.FOOTER || "Dreama";
 
         if (!voiceChannel) {
@@ -26,8 +27,9 @@ module.exports = {
                     new EmbedBuilder()
                         .setColor(COLORS.ERROR)
                         .setTitle("‼️ Please Join A Voice Channel First!")
-                        .setDescription("❌ You need to be in a voice channel to use this command.")
+                        .setDescription("You need to be in a voice channel to use this command.")
                         .setFooter({ text: footer })
+                        .setThumbnail(avatarURL)
                         .setTimestamp(),
                 ],
                 flags: MessageFlags.Ephemeral,
@@ -44,6 +46,7 @@ module.exports = {
                         .setTitle("❌ Nothing Is Playing!")
                         .setDescription("There is no active player in this server.")
                         .setFooter({ text: footer })
+                        .setThumbnail(avatarURL)
                         .setTimestamp(),
                 ],
                 flags: MessageFlags.Ephemeral,
@@ -56,8 +59,9 @@ module.exports = {
                     new EmbedBuilder()
                         .setColor(COLORS.ERROR)
                         .setTitle("‼️ Wrong Voice Channel!")
-                        .setDescription(`❌ You must be in <#${player.voiceChannelId}> to control playback.`)
+                        .setDescription(`You must be in <#${player.voiceChannelId}> to control playback.`)
                         .setFooter({ text: footer })
+                        .setThumbnail(avatarURL)
                         .setTimestamp(),
                 ],
                 flags: MessageFlags.Ephemeral,
@@ -72,6 +76,7 @@ module.exports = {
                         .setTitle("❌ Already Playing!")
                         .setDescription("The player is not paused. Use `/pause` to pause it.")
                         .setFooter({ text: footer })
+                        .setThumbnail(avatarURL)
                         .setTimestamp(),
                 ],
                 flags: MessageFlags.Ephemeral,
@@ -88,6 +93,7 @@ module.exports = {
                     .setTitle("▶️ Resumed")
                     .setDescription("Playback has been resumed!")
                     .setFooter({ text: footer })
+                    .setThumbnail(avatarURL)
                     .setTimestamp(),
             ],
         });
