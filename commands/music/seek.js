@@ -37,6 +37,7 @@ module.exports = {
         const guild = interaction.guild;
         const voiceChannel = member.voice?.channel;
         const footer = process.env.FOOTER || "Dreama";
+        const avatarURL = client?.user?.displayAvatarURL({ dynamic: true, size: 256 }) ?? null;
         const positionInput = interaction.options.getString("position");
 
         if (!voiceChannel) {
@@ -45,8 +46,9 @@ module.exports = {
                     new EmbedBuilder()
                         .setColor(COLORS.ERROR)
                         .setTitle("‼️ Please Join A Voice Channel First!")
-                        .setDescription("❌ You need to be in a voice channel to use this command.")
+                        .setDescription("You need to be in a voice channel to use this command.")
                         .setFooter({ text: footer })
+                        .setThumbnail(avatarURL)
                         .setTimestamp(),
                 ],
                 flags: MessageFlags.Ephemeral,
@@ -63,6 +65,7 @@ module.exports = {
                         .setTitle("❌ Nothing Is Playing!")
                         .setDescription("There is no active player in this server.")
                         .setFooter({ text: footer })
+                        .setThumbnail(avatarURL)
                         .setTimestamp(),
                 ],
                 flags: MessageFlags.Ephemeral,
@@ -75,8 +78,9 @@ module.exports = {
                     new EmbedBuilder()
                         .setColor(COLORS.ERROR)
                         .setTitle("‼️ Wrong Voice Channel!")
-                        .setDescription(`❌ You must be in <#${player.voiceChannelId}> to control playback.`)
+                        .setDescription(`You must be in <#${player.voiceChannelId}> to control playback.`)
                         .setFooter({ text: footer })
+                        .setThumbnail(avatarURL)
                         .setTimestamp(),
                 ],
                 flags: MessageFlags.Ephemeral,
@@ -93,6 +97,7 @@ module.exports = {
                         .setTitle("❌ Nothing Is Playing!")
                         .setDescription("There is no track currently playing.")
                         .setFooter({ text: footer })
+                        .setThumbnail(avatarURL)
                         .setTimestamp(),
                 ],
                 flags: MessageFlags.Ephemeral,
@@ -107,6 +112,7 @@ module.exports = {
                         .setTitle("❌ Track Is Not Seekable!")
                         .setDescription("The current track does not support seeking (e.g. live streams).")
                         .setFooter({ text: footer })
+                        .setThumbnail(avatarURL)
                         .setTimestamp(),
                 ],
                 flags: MessageFlags.Ephemeral,
@@ -123,6 +129,7 @@ module.exports = {
                         .setTitle("❌ Invalid Format!")
                         .setDescription("Please provide a valid time format.\n\n**Examples:**\n`90` — 90 seconds\n`1:30` — 1 minute 30 seconds\n`1:30:00` — 1 hour 30 minutes")
                         .setFooter({ text: footer })
+                        .setThumbnail(avatarURL)
                         .setTimestamp(),
                 ],
                 flags: MessageFlags.Ephemeral,
@@ -139,6 +146,7 @@ module.exports = {
                         .setTitle("❌ Position Out of Range!")
                         .setDescription(`The track is only **${formatDuration(trackDuration)}** long. You extended too much!`)
                         .setFooter({ text: footer })
+                        .setThumbnail(avatarURL)
                         .setTimestamp(),
                 ],
                 flags: MessageFlags.Ephemeral,
@@ -155,6 +163,7 @@ module.exports = {
                     .setTitle("⏩ Seeked")
                     .setDescription(`Jumped to **${formatDuration(positionMs)}** in **[${currentTrack.info.title}](${currentTrack.info.uri})**.`)
                     .setFooter({ text: footer })
+                    .setThumbnail(avatarURL)
                     .setTimestamp(),
             ],
         });
