@@ -3,7 +3,6 @@ const { EmbedBuilder } = require("discord.js");
 
 const username = process.env.USERNAME || "Dreama";
 const footer = process.env.FOOTER || "Dreama";
-const avatarURL = client?.user?.displayAvatarURL({ dynamic: true, size: 256 });
 
 const errorEmbed1 = new EmbedBuilder()
     .setColor("FF0000")
@@ -22,6 +21,7 @@ const errorEmbed2 = new EmbedBuilder()
     .setTimestamp();
 
 function buildHelpEmbed(client) {
+    const avatarURL = client?.user?.displayAvatarURL({ dynamic: true, size: 256 }) ?? null;
     const embed = new EmbedBuilder()
         .setColor("FF7F50")
         .setTitle(`${username} - Command Information Guide`)
