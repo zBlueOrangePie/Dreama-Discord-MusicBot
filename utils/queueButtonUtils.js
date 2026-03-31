@@ -83,7 +83,6 @@ function buildQueueEmbed(player, page) {
 
         queueList = lines.join("\n");
     }
-    const avatarURL = client?.user?.displayAvatarURL({ dynamic: true, size: 256 }) ?? null;
     const totalDuration = tracks.reduce((acc, t) => acc + (t.info.duration || 0), 0);
 
     return new EmbedBuilder()
@@ -110,7 +109,6 @@ function buildQueueEmbed(player, page) {
             },
         )
         .setFooter({ text: truncate(`${footer} • Total queue duration: ${formatDuration(totalDuration)} • Page ${page + 1}/${pages}`, 2048) })
-        .setThumbnail(avatarURL)
         .setTimestamp();
 }
 
