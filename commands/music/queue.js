@@ -41,7 +41,7 @@ module.exports = {
                         title: "📭 Queue Is Empty!",
                         description: "Nothing is playing right now. Use `/play` to add a song.",
                         footer: { text: footer },
-                        thumbnail: avatarURL
+                        thumbnail: avatarURL,
                         timestamp: new Date().toISOString(),
                     },
                 ],
