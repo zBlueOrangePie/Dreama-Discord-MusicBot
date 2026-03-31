@@ -34,6 +34,7 @@ module.exports = {
         const guild = interaction.guild;
         const voiceChannel = member.voice?.channel;
         const footer = process.env.FOOTER || 'Dreama';
+        const avatarURL = client?.user?.displayAvatarURL({ dynamic: true, size: 256 }) ?? null;
         const seconds = interaction.options.getInteger('seconds');
 
         if (!voiceChannel) {
@@ -44,6 +45,7 @@ module.exports = {
                         .setTitle('‼️ Please Join A Voice Channel First!')
                         .setDescription('You need to be in a voice channel to use this command.')
                         .setFooter({ text: footer })
+                        .setThumbnail(avatarURL)
                         .setTimestamp(),
                 ],
                 flags: MessageFlags.Ephemeral,
@@ -60,6 +62,7 @@ module.exports = {
                         .setTitle('❌ Nothing Is Playing!')
                         .setDescription('There is no active player in this server.')
                         .setFooter({ text: footer })
+                        .setThumbnail(avatarURL)
                         .setTimestamp(),
                 ],
                 flags: MessageFlags.Ephemeral,
@@ -74,6 +77,7 @@ module.exports = {
                         .setTitle('‼️ Wrong Voice Channel!')
                         .setDescription(`You must be in <#${player.voiceChannelId}> to control playback.`)
                         .setFooter({ text: footer })
+                        .setThumbnail(avatarURL)
                         .setTimestamp(),
                 ],
                 flags: MessageFlags.Ephemeral,
@@ -90,6 +94,7 @@ module.exports = {
                         .setTitle('❌ Nothing Is Playing!')
                         .setDescription('There is no track currently playing.')
                         .setFooter({ text: footer })
+                        .setThumbnail(avatarURL)
                         .setTimestamp(),
                 ],
                 flags: MessageFlags.Ephemeral,
@@ -104,6 +109,7 @@ module.exports = {
                         .setTitle('❌ Track Is Not Seekable!')
                         .setDescription('The current track does not support seeking (e.g. live streams).')
                         .setFooter({ text: footer })
+                        .setThumbnail(avatarURL)
                         .setTimestamp(),
                 ],
                 flags: MessageFlags.Ephemeral,
@@ -122,6 +128,7 @@ module.exports = {
                     .setTitle('⏪ Rewound')
                     .setDescription(`Rewound **${seconds} seconds** back to **${formatDuration(newPosition)}** in **[${currentTrack.info.title}](${currentTrack.info.uri})**.`)
                     .setFooter({ text: footer })
+                    .setThumbnail(avatarURL)
                     .setTimestamp(),
             ],
         });
