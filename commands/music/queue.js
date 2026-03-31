@@ -13,6 +13,7 @@ module.exports = {
         const client = interaction.client;
         const guild = interaction.guild;
         const footer = process.env.FOOTER || "Dreama";
+        const avatarURL = client?.user?.displayAvatarURL({ dynamic: true, size: 256 }) ?? null;
 
         const player = client.lavalink.getPlayer(guild.id);
 
@@ -24,6 +25,7 @@ module.exports = {
                         title: "❌ Nothing Is Playing!",
                         description: "There is no active player in this server.",
                         footer: { text: footer },
+                        thumbnail: avatarURL,
                         timestamp: new Date().toISOString(),
                     },
                 ],
@@ -39,6 +41,7 @@ module.exports = {
                         title: "📭 Queue Is Empty!",
                         description: "Nothing is playing right now. Use `/play` to add a song.",
                         footer: { text: footer },
+                        thumbnail: avatarURL
                         timestamp: new Date().toISOString(),
                     },
                 ],
