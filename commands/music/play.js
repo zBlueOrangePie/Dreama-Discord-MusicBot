@@ -28,10 +28,6 @@ module.exports = {
         const guild = interaction.guild;
         const voiceChannel = member.voice?.channel;
         const footer = process.env.FOOTER || "Dreama";
-        const avatarURL = client?.user?.displayAvatarURL({ dynamic: true, size: 256 }) ?? null;
-        const artworkUrl = typeof track.info.artworkUrl === "string" && track.info.artworkUrl.startsWith("http")
-                ? track.info.artworkUrl
-                : null;
 
         if (!voiceChannel) {
             return interaction.reply({
@@ -41,7 +37,6 @@ module.exports = {
                         .setTitle("‼️ Please Join A Voice Channel First!")
                         .setDescription("Dreama says that you need to be in a voice channel to use this command.")
                         .setFooter({ text: footer })
-                        .setThumbnail(avatarURL)
                         .setTimestamp(),
                 ],
                 flags: MessageFlags.Ephemeral
@@ -57,7 +52,6 @@ module.exports = {
                         .setTitle("‼️ I'm Already Playing!")
                         .setDescription(`I'm already in <#${botVoiceChannel.id}>. Join that channel to use me.`)
                         .setFooter({ text: footer })
-                        .setThumbnail(avatarURL)
                         .setTimestamp(),
                 ],
                 flags: MessageFlags.Ephemeral,
@@ -73,7 +67,6 @@ module.exports = {
                         .setTitle("‼️ Wrong Voice Channel!")
                         .setDescription(`Dreama is configured to only play music in <#${guildConfig.musicVoice}>. Please join that voice channel.`)
                         .setFooter({ text: footer })
-                        .setThumbnail(avatarURL)
                         .setTimestamp(),
                 ],
                 flags: MessageFlags.Ephemeral,
@@ -88,7 +81,6 @@ module.exports = {
                         .setTitle("❌ Internal Error Occurred.")
                         .setDescription("No music nodes are available right now. Please try again later.")
                         .setFooter({ text: footer })
-                        .setThumbnail(avatarURL)
                         .setTimestamp(),
                 ],
                 flags: MessageFlags.Ephemeral,
@@ -120,7 +112,6 @@ module.exports = {
                         .setTitle("❌ Search Failed")
                         .setDescription(`Could not retrieve results for **${query}**. The source may be unavailable, unsupported, or rate-limited by the Lavalink server.`)
                         .setFooter({ text: footer })
-                        .setThumbnail(avatarURL)
                         .setTimestamp(),
                 ],
             });
@@ -134,7 +125,6 @@ module.exports = {
                         .setTitle("❌ Search Failed")
                         .setDescription(`No results found for **${query}**.`)
                         .setFooter({ text: footer })
-                        .setThumbnail(avatarURL)
                         .setTimestamp(),
                 ],
             });
@@ -179,7 +169,6 @@ module.exports = {
                             },
                         )
                         .setFooter({ text: footer })
-                        .setThumbnail(artworkURL)
                         .setTimestamp(),
                 ],
             });
@@ -214,8 +203,6 @@ module.exports = {
                     )
                     .setFooter({ text: footer })
                     .setTimestamp();
-
-                if (artworkUrl) addedEmbed.setThumbnail(artworkUrl);
 
                 await interaction.editReply({ embeds: [addedEmbed] });
             } else {
