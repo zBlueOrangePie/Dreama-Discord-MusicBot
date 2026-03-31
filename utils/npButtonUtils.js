@@ -148,7 +148,6 @@ async function handleNpButton(interaction, client) {
                         .setTitle("❌ Cannot Skip!")
                         .setDescription("You can't use this when there is only one song in the current queue. Use **/play** to add more songs or **/stop** or click the stop button if you don't want to listen anymore.")
                         .setFooter({ text: footer })
-                        .setThumbnail(avatarURL)
                         .setTimestamp(),
                 ],
                 flags: MessageFlags.Ephemeral,
@@ -173,7 +172,6 @@ async function handleNpButton(interaction, client) {
                     .setTitle("⏹️ Stopped")
                     .setDescription("Playback has been stopped, the queue has been cleared, and I have disconnected.")
                     .setFooter({ text: footer })
-                    .setThumbnail(avatarURL)
                     .setTimestamp(),
             ],
             flags: MessageFlags.Ephemeral,
