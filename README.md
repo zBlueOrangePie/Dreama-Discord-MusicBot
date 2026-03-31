@@ -25,7 +25,7 @@
 ![👀 Previews!](/assets/nowplaying-3.png)
 
 
-![Search Card Image!](assets/search.png)
+![Search Card Image!](assets/Screenshot_20260331-210948_1.png)
 
 
 ![Volume Card Image!](assets/volume.png)
