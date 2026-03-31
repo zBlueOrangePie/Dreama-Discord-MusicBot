@@ -1,6 +1,7 @@
 require("dotenv").config();
 const { EmbedBuilder } = require("discord.js");
 
+const avatarURL = client?.user?.displayAvatarURL({ dynamic: true, size: 256 }) ?? null;
 const username = process.env.USERNAME || "Dreama";
 const footer = process.env.FOOTER || "Dreama";
 
@@ -9,6 +10,7 @@ const errorEmbed1 = new EmbedBuilder()
     .setTitle("Error")
     .setDescription("An error occurred while executing this command.")
     .setFooter({ text: footer })
+    .setThumbnail(avatarURL)
     .setTimestamp();
 
 const errorEmbed2 = new EmbedBuilder()
@@ -16,11 +18,10 @@ const errorEmbed2 = new EmbedBuilder()
     .setTitle("Error")
     .setDescription("Something went wrong. Please try again later.")
     .setFooter({ text: footer })
+    .setThumbnail(avatarURL)
     .setTimestamp();
 
 function buildHelpEmbed(client) {
-    const avatarURL = client?.user?.displayAvatarURL({ dynamic: true, size: 256 }) ?? null;
-
     const embed = new EmbedBuilder()
         .setColor("FF7F50")
         .setTitle(`${username} - Command Information Guide`)
