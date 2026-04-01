@@ -6,10 +6,21 @@ const { logger } = require("../../utils/logger.js");
 const GuildConfig = require("../../utils/database/configDb.js");
 
 const COLORS = {
-    DEFAULT: "5865F2",
-    SUCCESS: "50C878",
-    ERROR: "FF7F50",
+    DEFAULT: 'FF7F50',
+    SUCCESS: '50C878',
+    ERROR: 'FF0000',
 };
+
+const SUPPORTED_URL_PATTERNS = [
+    /^https?:\/\/(www\.)?(youtube\.com|youtu\.be)/i,
+    /^https?:\/\/(www\.)?soundcloud\.com/i,
+    /^https?:\/\/(www\.)?deezer\.com/i,
+    /^https?:\/\/open\.spotify\.com/i,
+    /^https?:\/\/(www\.)?twitch\.tv/i,
+    /^https?:\/\/(www\.)?vimeo\.com/i,
+];
+
+const URL_REGEX = /^https?:\/\//i;
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -100,6 +111,26 @@ module.exports = {
 
         const query = interaction.options.getString("query");
 
+        if (URL_REGEX.test(query)) {
+            const isSupported = SUPPORTED_URL_PATTERNS.some(p => p.test(query));
+            if (!isSupported) {
+                return interaction.editReply({
+                    embeds: [
+                        new EmbedBuilder()
+                            .setColor(COLORS.ERROR)
+                            .setTitle("❌ Unsupported Platform!")
+                            .setDescription(
+                                "The URL you provided is not from a supported platform.\n\n" +
+                                "**Supported platforms:** YouTube, SoundCloud, Deezer, Spotify, Twitch, Vimeo\n\n" +
+                                "Try using a search query instead or a link from a supported platform."
+                            )
+                            .setFooter({ text: footer })
+                            .setTimestamp(),
+                    ],
+                });
+            }
+        }
+
         let result;
         try {
             result = await player.search({ query }, interaction.user);
@@ -168,6 +199,7 @@ module.exports = {
                                 inline: true 
                             },
                         )
+                        .setThumbnail(result.tracks[0]?.info?.artworkUrl || null)
                         .setFooter({ text: footer })
                         .setTimestamp(),
                 ],
@@ -201,6 +233,7 @@ module.exports = {
                             inline: true 
                         },
                     )
+                    .setThumbnail(track.info.artworkUrl || null)
                     .setFooter({ text: footer })
                     .setTimestamp();
 
