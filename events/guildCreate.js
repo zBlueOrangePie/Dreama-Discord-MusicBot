@@ -23,19 +23,20 @@ module.exports = {
             const embed = new EmbedBuilder()
                 .setTitle('Thank you for inviting me!')
                 .setDescription(`Hello **${guild.name}**! I’m ${username} and im excited to be here! Use \`/help\` to see what I can do.`)
-            .addFields(
-                {
-                name: "🚀 Getting Started",
-                value: `Use **/config** to setup necessary configurations that you need.`,
-                inline: false
-            },
-                {
-                 name: "🎶 Music Commands",
-                 value: `You can use **/search** and **/play** if you want to start playing music in no time!`,
-                 inline: false
-            }
-       )
+                .addFields(
+                    {
+                        name: "🚀 Getting Started",
+                        value: `Use **/config** to setup necessary configurations that you need.`,
+                        inline: false
+                    },
+                    {
+                        name: "🎶 Music Commands",
+                        value: `You can use **/search** and **/play** if you want to start playing music in no time!`,
+                        inline: false
+                    }
+                )
                 .setColor(COLORS.DEFAULT)
+                .setThumbnail(client.user.displayAvatarURL())
                 .setFooter({ text: footer })
                 .setTimestamp();
 
