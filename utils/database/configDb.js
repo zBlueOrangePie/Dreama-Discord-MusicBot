@@ -14,6 +14,10 @@ const configSchema = new mongoose.Schema({
         type: String,
         default: null,
     },
+    playlistsEnabled: {
+        type: Boolean,
+        default: true,
+    },
 });
 
 module.exports = mongoose.model('GuildConfig', configSchema);
