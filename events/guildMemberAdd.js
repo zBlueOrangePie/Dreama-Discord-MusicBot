@@ -1,40 +1,59 @@
 require("dotenv").config();
-const { Events, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { Events, ContainerBuilder, TextDisplayBuilder, SectionBuilder, SeparatorBuilder, ThumbnailBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags, SeparatorSpacingSize } = require("discord.js");
 
 module.exports = {
     name: Events.GuildMemberAdd,
     once: false,
-    async execute(member, client) {
-        const footer = process.env.FOOTER || "Dreama";
-        // Replace with your actual support server channel ID
-        const welcomeChannelId = 'CHANNEL_ID';
 
-        const channel = member.guild.channels.cache.get(welcomeChannelId);
-        if (!channel) {
-            console.warn(`[Bot] ❌ Welcome channel not found for guild ${member.guild.name}`);
+    async execute(member) {
+        const client = member.client;
+        const welcomeChannelId = process.env.WELCOME_CHANNEL_ID;
+
+        if (!welcomeChannelId) {
+            console.warn(`[Bot] ❌ WELCOME_CHANNEL_ID is not set in .env — skipping welcome message.`);
             return;
         }
 
-        const inviteUrl = 'https://discord.com/oauth2/authorize?client_id=1477557922786447411&permissions=8&integration_type=0&scope=bot';
+        const channel = member.guild.channels.cache.get(welcomeChannelId);
+        if (!channel) {
+            console.warn(`[Bot] ❌ Welcome channel (${welcomeChannelId}) not found in guild ${member.guild.name}`);
+            return;
+        }
 
-        const embed = new EmbedBuilder()
-            .setTitle('Welcome To Dreama Community')
-            .setDescription('Thank you for joining the **official support server** of the Dreama Music Bot!')
-            .setThumbnail(member.user.displayAvatarURL())
-            .setFooter({ text: footer })
-            .setTimestamp();
+        const inviteUrl = process.env.INVITE_URL || "https://discord.com/oauth2/authorize?client_id=1477557922786447411&permissions=8&integration_type=0&scope=bot";
+        const memberAvatar = member.user.displayAvatarURL({ dynamic: true, size: 256 });
 
-        const row = new ActionRowBuilder().addComponents(
-            new ButtonBuilder()
-                .setLabel('Invite Dreama Bot')
-                .setStyle(ButtonStyle.Link)
-                .setURL(inviteUrl)
-        );
+        const inviteButton = new ButtonBuilder()
+            .setLabel("Invite Dreama Bot")
+            .setStyle(ButtonStyle.Link)
+            .setURL(inviteUrl);
+
+        const container = new ContainerBuilder()
+            .setAccentColor(0xFF7F50)
+            .addComponents(
+                new SectionBuilder()
+                    .addTextDisplayComponents(
+                        new TextDisplayBuilder().setContent(
+                            `## 🎉 Welcome, ${member}!\n` +
+                            `Thank you for joining the **Official Support Server** of the Dreama Music Bot!\n` +
+                            `We're really happy to have you here.`
+                        )
+                    )
+                    .setThumbnailAccessory(
+                        new ThumbnailBuilder().setURL(memberAvatar)
+                    ),
+                new SeparatorBuilder().setDivider(true).setSpacing(SeparatorSpacingSize.Small),
+                new TextDisplayBuilder().setContent(
+                    `Feel free to explore the server and enjoy music with **Dreama**!\n` +
+                    `Use \`/help\` to see all available commands, or invite the bot to your own server below.`
+                ),
+                new SeparatorBuilder().setDivider(true).setSpacing(SeparatorSpacingSize.Small),
+                new ActionRowBuilder().addComponents(inviteButton),
+            );
 
         await channel.send({
-            content: `Welcome ${member}! 🎉`,
-            embeds: [embed],
-            components: [row]
-        });
+            components: [container],
+            flags: MessageFlags.IsComponentsV2,
+        }).catch(err => console.error(`[Bot] ❌ Failed to send welcome message: ${err.message}`));
     },
 };
