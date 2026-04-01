@@ -1,21 +1,9 @@
 require('dotenv').config();
-const {
-    SlashCommandBuilder,
-    EmbedBuilder,
-    MessageFlags,
-    PermissionFlagsBits,
-} = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, MessageFlags, PermissionFlagsBits } = require('discord.js');
 const Playlist = require('../../utils/database/playlistDb.js');
 const GuildConfig = require('../../utils/database/configDb.js');
 const { formatDuration } = require('../../utils/formatDuration.js');
-const {
-    buildViewEmbed,
-    buildViewButtons,
-    buildSearchViewEmbed,
-    buildSearchNavButtons,
-    buildPlayButton,
-    TRACKS_PER_PAGE,
-} = require('../../utils/playlistButtonUtils.js');
+const { buildViewEmbed, buildViewButtons, buildSearchViewEmbed, buildSearchNavButtons, buildPlayButton, TRACKS_PER_PAGE } = require('../../utils/playlistButtonUtils.js');
 const { logger } = require('../../utils/logger.js');
 
 const COLORS = {
@@ -157,12 +145,20 @@ module.exports = {
             return interaction.reply({
                 embeds: [
                     new EmbedBuilder()
-                        .setColor(COLORS.SUCCESS)
+                        .setColor(COLORS.DEFAULT)
                         .setTitle('🌍 Global Playlist Created!')
                         .setDescription(`Your global playlist **${name}** has been created successfully!`)
                         .addFields(
-                            { name: 'Playlist ID', value: `\`${playlistId}\``, inline: true },
-                            { name: 'Type', value: '🌍 Global', inline: true },
+                            { 
+                                name: 'Playlist ID', 
+                                value: `\`${playlistId}\``, 
+                                inline: true 
+                            },
+                            { 
+                                name: 'Type', 
+                                value: '🌍 Global', 
+                                inline: true 
+                            },
                         )
                         .setThumbnail(avatarURL)
                         .setFooter({ text: `${footer} • Share your Playlist ID so others can find it!` })
@@ -533,11 +529,23 @@ module.exports = {
                         .addFields(
                             result.loadType !== 'playlist'
                                 ? [
-                                    { name: 'Author', value: addedTrack.author, inline: true },
-                                    { name: 'Duration', value: formatDuration(addedTrack.duration), inline: true },
+                                    { 
+                                        name: 'Author', 
+                                        value: addedTrack.author, 
+                                        inline: true 
+                                    },
+                                    { 
+                                        name: 'Duration', 
+                                        value: formatDuration(addedTrack.duration), 
+                                        inline: true 
+                                    },
                                 ]
                                 : [
-                                    { name: 'Tracks Added', value: `${tracksToAdd.length}`, inline: true },
+                                    { 
+                                        name: 'Tracks Added', 
+                                        value: `${tracksToAdd.length}`, 
+                                        inline: true 
+                                    },
                                 ]
                         )
                         .setThumbnail(addedTrack.artworkUrl || avatarURL)
@@ -617,8 +625,16 @@ module.exports = {
                         .setTitle('🗑️ Song Removed from Playlist')
                         .setDescription(`**${removedSong.title}** has been permanently removed from \`${playlistId}\`.`)
                         .addFields(
-                            { name: 'Author', value: removedSong.author || 'Unknown', inline: true },
-                            { name: 'Duration', value: formatDuration(removedSong.duration), inline: true },
+                            { 
+                                name: 'Author', 
+                                value: removedSong.author || 'Unknown', 
+                                inline: true 
+                            },
+                            { 
+                                name: 'Duration', 
+                                value: formatDuration(removedSong.duration), 
+                                inline: true 
+                            },
                         )
                         .setThumbnail(removedSong.artworkUrl || avatarURL)
                         .setFooter({ text: footer })
