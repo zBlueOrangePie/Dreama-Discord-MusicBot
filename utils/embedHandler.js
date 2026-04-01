@@ -3,7 +3,6 @@ const { EmbedBuilder } = require("discord.js");
 
 const username = process.env.USERNAME || "Dreama";
 const footer = process.env.FOOTER || "Dreama";
-const avatarUrl = "https://cdn.discordapp.com/avatars/1477557922786447411/dc170fbbccaaec703ed06f83994dc892.webp?size=1024";
 
 const errorEmbed1 = new EmbedBuilder()
     .setColor("FF0000")
@@ -46,7 +45,6 @@ function buildHelpEmbed(client) {
             }
         )
         .setFooter({ text: footer })
-        .setThumbnail(avatarUrl)
         .setTimestamp();
 
     if (avatarURL) embed.setThumbnail(avatarURL);
