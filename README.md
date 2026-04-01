@@ -58,13 +58,16 @@ Copy the example env file and fill in your values:
 cp .envExample .env
 ```
 
-> Then open `.env` and configure each field:
+> **Then open `.env` and configure each field:**
 
 ```env
 TOKEN= # Your Discord bot token
 CLIENT_ID= # Your Discord application/client ID
 USERNAME= # Your bot's display name
 MONGODB_URI= # Your mongodb for storing database (like configurations and recent songs)
+
+WELCOME_CHANNEL_ID= # Your channel id for sending welcome messages for new members (for your support server)
+INVITE_URL= # The invite link of your bot to be used in welcoming new members
 
 LAVA_HOST= # Hostname or IP of your Lavalink server (e.g. localhost)
 LAVA_PORT= # Port your Lavalink server listens on (e.g. 2333)
