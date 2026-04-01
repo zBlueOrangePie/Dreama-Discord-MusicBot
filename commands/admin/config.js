@@ -51,6 +51,21 @@ module.exports = {
             sub
                 .setName('reset')
                 .setDescription('Reset all Dreama settings back to default and delete the saved configuration.')
+        )
+        .addSubcommand(sub =>
+            sub
+                .setName('playlists')
+                .setDescription('Enable or disable server playlist creation in this guild.')
+                .addStringOption(option =>
+                    option
+                        .setName('state')
+                        .setDescription('Enable or disable server playlists.')
+                        .setRequired(true)
+                        .addChoices(
+                            { name: 'Enable', value: 'true' },
+                            { name: 'Disable', value: 'false' }
+                        )
+                )
         ),
 
     async execute(interaction) {
@@ -150,6 +165,7 @@ module.exports = {
 
             const musicChannel = config?.musicChannel ? `<#${config.musicChannel}>` : 'None (all channels allowed)';
             const musicVoice = config?.musicVoice   ? `<#${config.musicVoice}>`   : 'None (all voice channels allowed)';
+            const playlistsEnabled = config?.playlistsEnabled === false ? '❌ Disabled' : '✅ Enabled';
 
             return interaction.reply({
                 embeds: [
@@ -167,8 +183,38 @@ module.exports = {
                               value: musicVoice,   
                               inline: true 
                             },
+                            {
+                              name: 'Server Playlists',
+                              value: playlistsEnabled,
+                              inline: true,
+                            },
                         )
                         .setFooter({ text: `${footer} • More Settings Will Arrive Soon!` })
+                        .setTimestamp(),
+                ],
+            });
+        }
+
+        if (subcommand === 'playlists') {
+            const state = interaction.options.getString('state') === 'true';
+
+            await GuildConfig.findOneAndUpdate(
+                { guildId: guild.id },
+                { playlistsEnabled: state },
+                { upsert: true, new: true }
+            );
+
+            return interaction.reply({
+                embeds: [
+                    new EmbedBuilder()
+                        .setColor(COLORS.SUCCESS)
+                        .setTitle('✅ Server Playlists Updated')
+                        .setDescription(
+                            state
+                                ? 'Server playlist creation has been **enabled**. Members with the right permissions can now create server-wide playlists.'
+                                : 'Server playlist creation has been **disabled**. No new server-wide playlists can be created.'
+                        )
+                        .setFooter({ text: footer })
                         .setTimestamp(),
                 ],
             });
