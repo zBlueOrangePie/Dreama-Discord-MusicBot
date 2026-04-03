@@ -1,6 +1,16 @@
 # ✨ Dreama — Discord Music Bot
 
+<img src="assets/1000005530-modified.png" 
+     alt="Rounded image" 
+     align="right" 
+     width="128" 
+     height="128" />
+
+<div class="center">
+
 🎶 A Discord music bot built with [discord.js v14](https://discord.js.org/) and [lavalink-client](https://github.com/Tomato6966/lavalink-client), powered by a ``Lavalink v4`` audio server.
+
+</div>
 
 > [!TIP]
 > ‼️ This **code** was close to the documentation of **[lavalink-client](https://tomato6966.github.io/lavalink-client).** Everything is easy to understand. Please always give credits to __**@zBlueOrangePie**__ when using this code.
