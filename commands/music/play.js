@@ -184,7 +184,7 @@ module.exports = {
             const playlistThumb = result.tracks[0]?.info?.artworkUrl || avatarURL;
 
             const container = new ContainerBuilder()
-                .setAccentColor(0x50C878)
+                .setAccentColor(0xFF7F50)
                 .addSectionComponents((section) =>
                     section
                         .addTextDisplayComponents((text) =>
