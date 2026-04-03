@@ -1,21 +1,14 @@
 require("dotenv").config();
-const {
-    Events,
-    ContainerBuilder,
-    MessageFlags,
-    SeparatorSpacingSize,
-} = require("discord.js");
+const { Events, ContainerBuilder, MessageFlags, SeparatorSpacingSize } = require("discord.js");
 
 module.exports = {
     name: Events.GuildCreate,
     once: false,
 
     async execute(guild) {
-        // guild.client is the correct way to access the client in guild-based events.
-        // The old code tried to use a second `client` argument, which does not exist here.
-        const client    = guild.client;
-        const footer    = process.env.FOOTER   || "Dreama";
-        const username  = process.env.USERNAME || "Dreama";
+        const client = guild.client;
+        const footer = process.env.FOOTER || "Dreama";
+        const username = process.env.USERNAME || "Dreama";
         const avatarURL = client.user?.displayAvatarURL({ dynamic: true, size: 256 })
             ?? "https://cdn.discordapp.com/embed/avatars/0.png";
 
@@ -57,6 +50,7 @@ module.exports = {
                     `### 🎶 Music Commands\n` +
                     `Use **/search** and **/play** to start playing music right away!\n` +
                     `Explore **/playlist** to create and manage your own playlists.\n\n` +
+                    `Tip: Use **/recommend** when you got nothing to play!\n` +
                     `-# ${footer}`
                 )
             );
