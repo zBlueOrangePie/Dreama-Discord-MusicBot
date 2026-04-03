@@ -4,7 +4,7 @@ const { SlashCommandBuilder, EmbedBuilder, MessageFlags, ChannelType } = require
 const COLORS = {
     DEFAULT: "FF7F50",
     SUCCESS: "50C878",
-    ERROR:   "FF0000",
+    ERROR: "FF0000",
 };
 
 module.exports = {
@@ -22,7 +22,7 @@ module.exports = {
     async execute(interaction) {
         const client = interaction.client;
         const member = interaction.member;
-        const guild  = interaction.guild;
+        const guild = interaction.guild;
         const footer = process.env.FOOTER || "Dreama";
 
         const player = client.lavalink.getPlayer(guild.id);
@@ -44,7 +44,7 @@ module.exports = {
         // Determine the target channel — either the option or the user's current VC
         const specifiedChannel = interaction.options.getChannel("channel");
         const userVoiceChannel = member.voice?.channel;
-        const targetChannel    = specifiedChannel ?? userVoiceChannel;
+        const targetChannel = specifiedChannel ?? userVoiceChannel;
 
         if (!targetChannel) {
             return interaction.reply({
