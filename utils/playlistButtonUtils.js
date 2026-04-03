@@ -1,17 +1,11 @@
 require("dotenv").config();
-const {
-    ContainerBuilder,
-    ButtonBuilder,
-    ButtonStyle,
-    MessageFlags,
-    SeparatorSpacingSize,
-} = require("discord.js");
+const { ContainerBuilder, ButtonBuilder, ButtonStyle, MessageFlags, SeparatorSpacingSize } = require("discord.js");
 const { formatDuration } = require("./formatDuration.js");
 const { syncNpMessage } = require("./npButtonUtils.js");
 const Playlist = require("./database/playlistDb.js");
 
 const TRACKS_PER_PAGE = 10;
-const CACHE_TTL_MS    = 10 * 60 * 1000;
+const CACHE_TTL_MS = 10 * 60 * 1000;
 
 const playlistSearchCache = new Map();
 
@@ -25,14 +19,14 @@ function getPlaylistSearchCache(messageId) {
 }
 
 function buildViewComponents(playlist, page, client) {
-    const footer     = process.env.FOOTER || "Dreama";
-    const avatarURL  = client?.user?.displayAvatarURL({ dynamic: true, size: 256 }) ?? "https://cdn.discordapp.com/embed/avatars/0.png";
-    const songs      = playlist.songs;
-    const total      = songs.length;
+    const footer = process.env.FOOTER || "Dreama";
+    const avatarURL = client?.user?.displayAvatarURL({ dynamic: true, size: 256 }) ?? "https://cdn.discordapp.com/embed/avatars/0.png";
+    const songs = playlist.songs;
+    const total = songs.length;
     const totalPages = Math.max(1, Math.ceil(total / TRACKS_PER_PAGE));
-    const totalDur   = songs.reduce((acc, s) => acc + (s.duration || 0), 0);
-    const start      = page * TRACKS_PER_PAGE;
-    const slice      = songs.slice(start, start + TRACKS_PER_PAGE);
+    const totalDur = songs.reduce((acc, s) => acc + (s.duration || 0), 0);
+    const start = page * TRACKS_PER_PAGE;
+    const slice = songs.slice(start, start + TRACKS_PER_PAGE);
 
     let trackList = "No songs have been added to this playlist yet.";
 
@@ -44,7 +38,7 @@ function buildViewComponents(playlist, page, client) {
         }).join("\n\n");
     }
 
-    const typeLabel    = playlist.type === "global" ? "🌍 Global" : "🏠 Server";
+    const typeLabel = playlist.type === "global" ? "🌍 Global" : "🏠 Server";
     const creatorLabel = `${playlist.creatorDisplayName} (@${playlist.creatorUsername})`;
 
     const infoText = [
@@ -106,14 +100,14 @@ function buildViewComponents(playlist, page, client) {
 }
 
 function buildSearchViewComponents(playlist, page, client) {
-    const footer     = process.env.FOOTER || "Dreama";
-    const avatarURL  = client?.user?.displayAvatarURL({ dynamic: true, size: 256 }) ?? "https://cdn.discordapp.com/embed/avatars/0.png";
-    const songs      = playlist.songs;
-    const total      = songs.length;
+    const footer = process.env.FOOTER || "Dreama";
+    const avatarURL = client?.user?.displayAvatarURL({ dynamic: true, size: 256 }) ?? "https://cdn.discordapp.com/embed/avatars/0.png";
+    const songs = playlist.songs;
+    const total = songs.length;
     const totalPages = Math.max(1, Math.ceil(total / TRACKS_PER_PAGE));
-    const totalDur   = songs.reduce((acc, s) => acc + (s.duration || 0), 0);
-    const start      = page * TRACKS_PER_PAGE;
-    const slice      = songs.slice(start, start + TRACKS_PER_PAGE);
+    const totalDur = songs.reduce((acc, s) => acc + (s.duration || 0), 0);
+    const start = page * TRACKS_PER_PAGE;
+    const slice = songs.slice(start, start + TRACKS_PER_PAGE);
 
     let trackList = "No songs have been added to this playlist yet.";
 
@@ -196,10 +190,10 @@ function buildSearchViewComponents(playlist, page, client) {
 }
 
 async function handlePlaylistViewButton(interaction, client) {
-    const parts   = interaction.customId.split(":");
-    const dir     = parts[0].replace("playlist_view_", "");
+    const parts = interaction.customId.split(":");
+    const dir = parts[0].replace("playlist_view_", "");
     const curPage = parseInt(parts[1], 10);
-    const plId    = parts[2];
+    const plId = parts[2];
 
     const playlist = await Playlist.findOne({ playlistId: plId }).lean();
 
@@ -222,13 +216,13 @@ async function handlePlaylistViewButton(interaction, client) {
 }
 
 async function handlePlaylistSearchButton(interaction, client) {
-    const footer    = process.env.FOOTER || "Dreama";
+    const footer = process.env.FOOTER || "Dreama";
     const avatarURL = client?.user?.displayAvatarURL({ dynamic: true, size: 256 }) ?? "https://cdn.discordapp.com/embed/avatars/0.png";
-    const id        = interaction.customId;
+    const id = interaction.customId;
 
     if (id.startsWith("playlist_srch_play:")) {
         const playlistId = id.replace("playlist_srch_play:", "");
-        const playlist   = await Playlist.findOne({ playlistId }).lean();
+        const playlist = await Playlist.findOne({ playlistId }).lean();
 
         if (!playlist || !playlist.songs.length) {
             return interaction.reply({
@@ -299,7 +293,7 @@ async function handlePlaylistSearchButton(interaction, client) {
         if (!player.connected) await player.connect();
 
         const nodes = [...client.lavalink.nodeManager.nodes.values()];
-        const node  = nodes.find(n => n.connected) || nodes[0];
+        const node = nodes.find(n => n.connected) || nodes[0];
 
         if (!node) {
             return interaction.editReply({
@@ -354,10 +348,10 @@ async function handlePlaylistSearchButton(interaction, client) {
         });
     }
 
-    const parts   = id.split(":");
-    const dir     = parts[0].includes("prev") ? "prev" : "next";
+    const parts = id.split(":");
+    const dir = parts[0].includes("prev") ? "prev" : "next";
     const curPage = parseInt(parts[1], 10);
-    const plId    = parts[2];
+    const plId = parts[2];
 
     const playlist = await Playlist.findOne({ playlistId: plId }).lean();
 
