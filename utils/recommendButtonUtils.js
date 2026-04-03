@@ -1,12 +1,10 @@
 require("dotenv").config();
-const {
-    ContainerBuilder,
-    StringSelectMenuBuilder,
-    MessageFlags,
-    SeparatorSpacingSize,
-} = require("discord.js");
+const { ContainerBuilder, StringSelectMenuBuilder, MessageFlags, SeparatorSpacingSize } = require("discord.js");
 const { formatDuration } = require("./formatDuration.js");
 const { syncNpMessage } = require("./npButtonUtils.js");
+
+/* You can add more songs into each genres, add it inside the songs: [] array.
+You can remove or modify one genres right in here! */
 
 const GENRES = {
     pop: {
@@ -59,6 +57,7 @@ const GENRES = {
             "Congratulations Post Malone",
             "No Role Modelz J Cole",
             "Love Yourz J Cole",
+            "Body Rock",
         ],
     },
     rock: {
@@ -137,32 +136,6 @@ const GENRES = {
             "Summer Calvin Harris",
             "This Is What You Came For Calvin Harris",
             "Lean On DJ Snake",
-        ],
-    },
-    jazz: {
-        label: "🎺 Jazz",
-        description: "Timeless jazz classics",
-        songs: [
-            "Take Five Dave Brubeck",
-            "So What Miles Davis",
-            "Autumn Leaves Chet Baker",
-            "Fly Me to the Moon Frank Sinatra",
-            "What a Wonderful World Louis Armstrong",
-            "Summertime Billie Holiday",
-            "Blue in Green Bill Evans",
-            "Round Midnight Thelonious Monk",
-            "My Favorite Things John Coltrane",
-            "Girl from Ipanema Stan Getz",
-            "Blue Bossa Joe Henderson",
-            "Green Dolphin Street Miles Davis",
-            "Misty Erroll Garner",
-            "All The Things You Are Charlie Parker",
-            "Wave Antonio Carlos Jobim",
-            "Softly As In A Morning Sunrise Chet Baker",
-            "Bye Bye Blackbird Miles Davis",
-            "Body and Soul Coleman Hawkins",
-            "In a Mellow Tone Duke Ellington",
-            "Stella By Starlight Miles Davis",
         ],
     },
     classical: {
@@ -247,32 +220,6 @@ const GENRES = {
             "Ikaw At Ako Moira Dela Torre Jason Marvin",
         ],
     },
-    country: {
-        label: "🤠 Country",
-        description: "Classic and modern country tunes",
-        songs: [
-            "Old Town Road Lil Nas X",
-            "Friends in Low Places Garth Brooks",
-            "Before He Cheats Carrie Underwood",
-            "Jolene Dolly Parton",
-            "Take Me Home Country Roads John Denver",
-            "Wagon Wheel Darius Rucker",
-            "Tennessee Whiskey Chris Stapleton",
-            "Cruise Florida Georgia Line",
-            "Body Like a Back Road Sam Hunt",
-            "Die a Happy Man Thomas Rhett",
-            "Bless The Broken Road Rascal Flatts",
-            "Need You Now Lady Antebellum",
-            "If I Die Young The Band Perry",
-            "Live Like You Were Dying Tim McGraw",
-            "Something In The Water Carrie Underwood",
-            "The House That Built Me Miranda Lambert",
-            "Beer Never Broke My Heart Luke Combs",
-            "Hurricane Luke Combs",
-            "She's Country Jason Aldean",
-            "Fly Over States Jason Aldean",
-        ],
-    },
 };
 
 function buildMenuOptions() {
@@ -316,7 +263,7 @@ function buildRecommendComponents(client) {
 
 function buildRecommendResultComponents(track, genre, wasPlaying, avatarURL, interaction) {
     const thumbnailUrl = track.info.artworkUrl || avatarURL;
-    const options      = buildMenuOptions();
+    const options = buildMenuOptions();
 
     const container = new ContainerBuilder()
         .setAccentColor(0xFF7F50)
@@ -325,7 +272,7 @@ function buildRecommendResultComponents(track, genre, wasPlaying, avatarURL, int
                 .addTextDisplayComponents((text) =>
                     text.setContent(
                         `## 🎶 Dreama Recommends — ${genre.label}\n` +
-                        `**[${track.info.title}](${track.info.uri})**\n` +
+                        `**[${track.info.title}](${track.info.uri})**\n\n` +
                         (wasPlaying ? "-# ✅ Added to queue!" : "-# ▶️ Now playing!")
                     )
                 )
@@ -336,8 +283,8 @@ function buildRecommendResultComponents(track, genre, wasPlaying, avatarURL, int
         )
         .addTextDisplayComponents((text) =>
             text.setContent(
-                `**Author:** ${track.info.author || "Unknown"}   ·   ` +
-                `**Duration:** ${formatDuration(track.info.duration)}   ·   ` +
+                `**Author:** ${track.info.author || "Unknown"}\n` +
+                `**Duration:** ${formatDuration(track.info.duration)}\n` +
                 `**Requested by:** ${interaction.user}`
             )
         )
@@ -387,9 +334,9 @@ function buildRecommendErrorComponents(message, avatarURL) {
 
 async function handleRecommendSelect(interaction, client) {
     const avatarURL = client?.user?.displayAvatarURL({ dynamic: true, size: 256 }) ?? "https://cdn.discordapp.com/embed/avatars/0.png";
-    const footer    = process.env.FOOTER || "Dreama";
-    const genreKey  = interaction.values[0];
-    const genre     = GENRES[genreKey];
+    const footer = process.env.FOOTER || "Dreama";
+    const genreKey = interaction.values[0];
+    const genre = GENRES[genreKey];
 
     if (!genre) {
         return interaction.reply({
@@ -469,8 +416,8 @@ async function handleRecommendSelect(interaction, client) {
             });
         }
 
-        const pickCount  = Math.min(result.tracks.length, 3);
-        const track      = result.tracks[Math.floor(Math.random() * pickCount)];
+        const pickCount = Math.min(result.tracks.length, 3);
+        const track = result.tracks[Math.floor(Math.random() * pickCount)];
         const wasPlaying = player.playing || player.paused;
 
         await player.queue.add(track);
