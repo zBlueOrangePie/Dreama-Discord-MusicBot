@@ -5,24 +5,24 @@ const { syncNpMessage } = require("../../utils/npButtonUtils.js");
 const COLORS = {
     DEFAULT: "FF7F50",
     SUCCESS: "50C878",
-    ERROR:   "FF0000",
+    ERROR: "FF0000",
 };
 
 const MODE_INFO = {
     off: {
-        title:       "🔁 Repeat Disabled",
+        title: "🔁 Repeat Disabled",
         description: "Repeat is now **off**. The queue will play through once and stop.",
-        color:       COLORS.DEFAULT,
+        color: COLORS.DEFAULT,
     },
     track: {
-        title:       "🔂 Repeating Current Track",
+        title: "🔂 Repeating Current Track",
         description: "Now repeating the **current track** on loop. Use `/repeat mode:Queue` or `/repeat mode:Off` to change.",
-        color:       COLORS.SUCCESS,
+        color: COLORS.DEFAULT,
     },
     queue: {
-        title:       "🔁 Repeating Queue",
+        title: "🔁 Repeating Queue",
         description: "Now repeating the **entire queue** on loop. Use `/repeat mode:Off` to stop.",
-        color:       COLORS.SUCCESS,
+        color: COLORS.DEFAULT,
     },
 };
 
@@ -36,19 +36,28 @@ module.exports = {
                 .setDescription("Choose a repeat mode.")
                 .setRequired(true)
                 .addChoices(
-                    { name: "🔂 Track — loop the current song",  value: "track" },
-                    { name: "🔁 Queue — loop the entire queue",   value: "queue" },
-                    { name: "⛔ Off   — disable repeat",           value: "off"   },
+                    { 
+                        name: "🔂 Track — loop the current song",  
+                        value: "track" 
+                    },
+                    { 
+                        name: "🔁 Queue — loop the entire queue",  
+                        value: "queue" 
+                    },
+                    {
+                        name: "⛔ Off   — disable repeat",     
+                        value: "off"  
+                    },
                 )
         ),
 
     async execute(interaction) {
-        const client       = interaction.client;
-        const member       = interaction.member;
-        const guild        = interaction.guild;
+        const client = interaction.client;
+        const member = interaction.member;
+        const guild = interaction.guild;
         const voiceChannel = member.voice?.channel;
-        const footer       = process.env.FOOTER || "Dreama";
-        const mode         = interaction.options.getString("mode");
+        const footer = process.env.FOOTER || "Dreama";
+        const mode = interaction.options.getString("mode");
 
         if (!voiceChannel) {
             return interaction.reply({
