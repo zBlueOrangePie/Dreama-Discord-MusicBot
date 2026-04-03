@@ -1,44 +1,38 @@
 require("dotenv").config();
-const {
-    ContainerBuilder,
-    ButtonBuilder,
-    ButtonStyle,
-    MessageFlags,
-    SeparatorSpacingSize,
-} = require("discord.js");
+const { ContainerBuilder, ButtonBuilder, ButtonStyle, MessageFlags, SeparatorSpacingSize } = require("discord.js");
 const { formatDuration } = require("./formatDuration.js");
 
 const REPEAT_CYCLE = {
-    off:   "track",
+    off: "track",
     track: "queue",
     queue: "off",
 };
 
 const REPEAT_LABELS = {
-    off:   "Off",
-    track: "🔂 Track",
-    queue: "🔁 Queue",
+    off: "Off",
+    track: "Track",
+    queue: "Queue",
 };
 
 const REPEAT_STYLES = {
-    off:   ButtonStyle.Secondary,
+    off: ButtonStyle.Secondary,
     track: ButtonStyle.Primary,
     queue: ButtonStyle.Success,
 };
 
 function buildNpComponents(player, track, client) {
-    const avatarURL    = client?.user?.displayAvatarURL({ dynamic: true, size: 256 }) ?? "https://cdn.discordapp.com/embed/avatars/0.png";
+    const avatarURL = client?.user?.displayAvatarURL({ dynamic: true, size: 256 }) ?? "https://cdn.discordapp.com/embed/avatars/0.png";
     const thumbnailUrl = track?.info?.artworkUrl || avatarURL;
-    const title        = track?.info?.title      || "Unknown";
-    const uri          = track?.info?.uri        || "";
-    const source       = track?.info?.sourceName || "Unknown";
-    const author       = track?.info?.author     || "Unknown";
-    const duration     = formatDuration(track?.info?.duration || 0);
-    const requester    = track?.requester?.username || "Unknown";
-    const repeatMode   = player.repeatMode ?? "off";
-    const autoplay     = player.get("autoplay") ?? false;
-    const paused       = player.paused;
-    const hasNext      = (player.queue?.tracks?.length ?? 0) > 0;
+    const title = track?.info?.title      || "Unknown";
+    const uri = track?.info?.uri        || "";
+    const source = track?.info?.sourceName || "Unknown";
+    const author = track?.info?.author     || "Unknown";
+    const duration = formatDuration(track?.info?.duration || 0);
+    const requester = track?.requester?.username || "Unknown";
+    const repeatMode = player.repeatMode ?? "off";
+    const autoplay = player.get("autoplay") ?? false;
+    const paused = player.paused;
+    const hasNext = (player.queue?.tracks?.length ?? 0) > 0;
 
     const statusLine = `${paused ? "⏸️ Paused" : "▶️ Playing"}   ·   🔁 Repeat: ${REPEAT_LABELS[repeatMode]}   ·   🔀 Autoplay: ${autoplay ? "On" : "Off"}`;
 
@@ -56,8 +50,10 @@ function buildNpComponents(player, track, client) {
         )
         .addTextDisplayComponents((text) =>
             text.setContent(
-                `**Source:** ${source}   ·   **Author:** ${author}\n` +
-                `**Duration:** ${duration}   ·   **Requested by:** ${requester}\n\n` +
+                `**Source:** ${source}\n` +   
+                `**Author:** ${author}\n` +
+                `**Duration:** ${duration}\n` +   
+                `**Requested by:** ${requester}\n\n` +
                 `-# ${statusLine}`
             )
         )
@@ -94,14 +90,14 @@ function buildNpComponents(player, track, client) {
 }
 
 function buildDisabledNpComponents(player) {
-    const track     = player.npTrack;
-    const client    = player.npClient;
+    const track = player.npTrack;
+    const client = player.npClient;
     const avatarURL = client?.user?.displayAvatarURL({ dynamic: true, size: 256 }) ?? "https://cdn.discordapp.com/embed/avatars/0.png";
-    const thumbUrl  = track?.info?.artworkUrl || avatarURL;
-    const title     = track?.info?.title      || "Unknown";
-    const uri       = track?.info?.uri        || "";
-    const author    = track?.info?.author     || "Unknown";
-    const duration  = formatDuration(track?.info?.duration || 0);
+    const thumbUrl = track?.info?.artworkUrl || avatarURL;
+    const title = track?.info?.title || "Unknown";
+    const uri = track?.info?.uri || "";
+    const author = track?.info?.author || "Unknown";
+    const duration = formatDuration(track?.info?.duration || 0);
 
     const container = new ContainerBuilder()
         .setAccentColor(0x808080)
@@ -116,7 +112,9 @@ function buildDisabledNpComponents(player) {
             sep.setDivider(true).setSpacing(SeparatorSpacingSize.Small)
         )
         .addTextDisplayComponents((text) =>
-            text.setContent(`**Author:** ${author}   ·   **Duration:** ${duration}\n-# Playback has ended.`)
+            text.setContent(`**Author:** ${author}\n` +   
+                            `**Duration:** ${duration}\n
+                            -# Playback has now ended.`)
         )
         .addSeparatorComponents((sep) =>
             sep.setDivider(true).setSpacing(SeparatorSpacingSize.Small)
@@ -162,7 +160,7 @@ async function handleNpButton(interaction, client) {
         });
     }
 
-    const id    = interaction.customId;
+    const id = interaction.customId;
     const track = player.queue.current;
 
     if (id === "np_pause_resume") {
