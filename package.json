@@ -1,6 +1,6 @@
 {
   "name": "Dreama-Discord-MusicBot",
-  "version": "1.0.0",
+  "version": "1.0.5",
   "main": "index.js",
   "scripts": {
     "deployCommands": "node deploy-cmds.js",
