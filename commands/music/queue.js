@@ -1,8 +1,6 @@
 require("dotenv").config();
 const { SlashCommandBuilder, MessageFlags } = require("discord.js");
-const { buildQueueRow, buildQueueEmbed } = require("../../utils/queueButtonUtils.js");
-
-const MAX_DISPLAY = 10;
+const { buildQueueComponents } = require("../../utils/queueButtonUtils.js");
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -11,7 +9,7 @@ module.exports = {
 
     async execute(interaction) {
         const client = interaction.client;
-        const guild = interaction.guild;
+        const guild  = interaction.guild;
         const footer = process.env.FOOTER || "Dreama";
 
         const player = client.lavalink.getPlayer(guild.id);
@@ -46,17 +44,9 @@ module.exports = {
             });
         }
 
-        const tracks = player.queue.tracks;
-        const totalPages = Math.max(1, Math.ceil(tracks.length / MAX_DISPLAY));
-
-        const embed = buildQueueEmbed(player, 0);
-
-        if (tracks.length > MAX_DISPLAY) {
-            const row = buildQueueRow(0, totalPages);
-            return interaction.reply({ embeds: [embed], components: [row] });
-        }
-
-        return interaction.reply({ embeds: [embed] });
+        return interaction.reply({
+            components: buildQueueComponents(player, 0, client),
+            flags: MessageFlags.IsComponentsV2,
+        });
     },
 };
-                                     

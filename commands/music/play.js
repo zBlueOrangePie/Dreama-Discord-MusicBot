@@ -1,14 +1,20 @@
 require("dotenv").config();
-const { SlashCommandBuilder, EmbedBuilder, MessageFlags } = require("discord.js");
+const {
+    SlashCommandBuilder,
+    EmbedBuilder,
+    ContainerBuilder,
+    MessageFlags,
+    SeparatorSpacingSize,
+} = require("discord.js");
 const { formatDuration } = require("../../utils/formatDuration.js");
 const { syncNpMessage } = require("../../utils/npButtonUtils.js");
 const { logger } = require("../../utils/logger.js");
 const GuildConfig = require("../../utils/database/configDb.js");
 
 const COLORS = {
-    DEFAULT: 'FF7F50',
-    SUCCESS: '50C878',
-    ERROR: 'FF0000',
+    DEFAULT: "FF7F50",
+    SUCCESS: "50C878",
+    ERROR:   "FF0000",
 };
 
 const SUPPORTED_URL_PATTERNS = [
@@ -34,11 +40,12 @@ module.exports = {
         ),
 
     async execute(interaction) {
-        const client = interaction.client;
-        const member = interaction.member;
-        const guild = interaction.guild;
+        const client       = interaction.client;
+        const member       = interaction.member;
+        const guild        = interaction.guild;
         const voiceChannel = member.voice?.channel;
-        const footer = process.env.FOOTER || "Dreama";
+        const footer       = process.env.FOOTER || "Dreama";
+        const avatarURL    = client?.user?.displayAvatarURL({ dynamic: true, size: 256 }) ?? "https://cdn.discordapp.com/embed/avatars/0.png";
 
         if (!voiceChannel) {
             return interaction.reply({
@@ -50,7 +57,7 @@ module.exports = {
                         .setFooter({ text: footer })
                         .setTimestamp(),
                 ],
-                flags: MessageFlags.Ephemeral
+                flags: MessageFlags.Ephemeral,
             });
         }
 
@@ -178,71 +185,73 @@ module.exports = {
 
         if (result.loadType === "playlist") {
             await player.queue.add(result.tracks);
-
             if (wasPlaying) await syncNpMessage(player);
 
-            await interaction.editReply({
-                embeds: [
-                    new EmbedBuilder()
-                        .setColor(COLORS.SUCCESS)
-                        .setTitle("📋 Playlist Added to Queue")
-                        .setDescription(`**[${result.playlist.name}](${query})**`)
-                        .addFields(
-                            { 
-                                name: "Tracks",       
-                                value: `${result.tracks.length}`, 
-                                inline: true 
-                            },
-                            { 
-                                name: "Requested By", 
-                                value: `${interaction.user}`,     
-                                inline: true 
-                            },
+            const playlistThumb = result.tracks[0]?.info?.artworkUrl || avatarURL;
+
+            const container = new ContainerBuilder()
+                .setAccentColor(0x50C878)
+                .addSectionComponents((section) =>
+                    section
+                        .addTextDisplayComponents((text) =>
+                            text.setContent(
+                                `## 📋 Playlist Added to Queue!\n**[${result.playlist.name}](${query})**`
+                            )
                         )
-                        .setThumbnail(result.tracks[0]?.info?.artworkUrl || null)
-                        .setFooter({ text: footer })
-                        .setTimestamp(),
-                ],
-            });
-        } else {
-            const track = result.tracks[0];
-
-            await player.queue.add(track);
-
-            if (wasPlaying) {
-                await syncNpMessage(player);
-
-                const addedEmbed = new EmbedBuilder()
-                    .setColor(COLORS.DEFAULT)
-                    .setTitle("🎵 Song Has Been Added to Queue!")
-                    .setDescription(`Song Title: **[${track.info.title}](${track.info.uri})**`)
-                    .addFields(
-                        { 
-                            name: "Author",       
-                            value: track.info.author || "Unknown",      
-                            inline: true 
-                        },
-                        { 
-                            name: "Duration",     
-                            value: formatDuration(track.info.duration), 
-                            inline: true 
-                        },
-                        { 
-                            name: "Requested By", 
-                            value: `${interaction.user}`,               
-                            inline: true 
-                        },
+                        .setThumbnailAccessory((thumb) => thumb.setURL(playlistThumb))
+                )
+                .addSeparatorComponents((sep) =>
+                    sep.setDivider(true).setSpacing(SeparatorSpacingSize.Small)
+                )
+                .addTextDisplayComponents((text) =>
+                    text.setContent(
+                        `**Tracks:** ${result.tracks.length}   ·   **Requested by:** ${interaction.user}\n-# ${footer}`
                     )
-                    .setThumbnail(track.info.artworkUrl || null)
-                    .setFooter({ text: footer })
-                    .setTimestamp();
+                );
 
-                await interaction.editReply({ embeds: [addedEmbed] });
-            } else {
-                await interaction.deleteReply().catch(() => null);
-            }
+            return interaction.editReply({
+                components: [container],
+                flags: MessageFlags.IsComponentsV2,
+            });
         }
 
-        if (!wasPlaying) await player.play();
+        const track = result.tracks[0];
+        await player.queue.add(track);
+
+        if (wasPlaying) {
+            await syncNpMessage(player);
+
+            const thumbnailUrl = track.info.artworkUrl || avatarURL;
+
+            const container = new ContainerBuilder()
+                .setAccentColor(0xFF7F50)
+                .addSectionComponents((section) =>
+                    section
+                        .addTextDisplayComponents((text) =>
+                            text.setContent(
+                                `## 🎵 Added to Queue!\n**[${track.info.title}](${track.info.uri})**`
+                            )
+                        )
+                        .setThumbnailAccessory((thumb) => thumb.setURL(thumbnailUrl))
+                )
+                .addSeparatorComponents((sep) =>
+                    sep.setDivider(true).setSpacing(SeparatorSpacingSize.Small)
+                )
+                .addTextDisplayComponents((text) =>
+                    text.setContent(
+                        `**Author:** ${track.info.author || "Unknown"}   ·   ` +
+                        `**Duration:** ${formatDuration(track.info.duration)}   ·   ` +
+                        `**Requested by:** ${interaction.user}\n-# ${footer}`
+                    )
+                );
+
+            return interaction.editReply({
+                components: [container],
+                flags: MessageFlags.IsComponentsV2,
+            });
+        }
+
+        await interaction.deleteReply().catch(() => null);
+        await player.play();
     },
 };
