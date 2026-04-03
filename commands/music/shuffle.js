@@ -5,7 +5,7 @@ const { syncNpMessage } = require("../../utils/npButtonUtils.js");
 const COLORS = {
     DEFAULT: "FF7F50",
     SUCCESS: "50C878",
-    ERROR:   "FF0000",
+    ERROR: "FF0000",
 };
 
 module.exports = {
@@ -14,11 +14,11 @@ module.exports = {
         .setDescription("Randomly shuffle all upcoming tracks in the queue."),
 
     async execute(interaction) {
-        const client       = interaction.client;
-        const member       = interaction.member;
-        const guild        = interaction.guild;
+        const client = interaction.client;
+        const member = interaction.member;
+        const guild = interaction.guild;
         const voiceChannel = member.voice?.channel;
-        const footer       = process.env.FOOTER || "Dreama";
+        const footer = process.env.FOOTER || "Dreama";
 
         if (!voiceChannel) {
             return interaction.reply({
