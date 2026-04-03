@@ -1,27 +1,19 @@
 require("dotenv").config();
 const { LavalinkManager } = require("lavalink-client");
-const {
-    Client,
-    Collection,
-    GatewayIntentBits,
-    ActivityType,
-    EmbedBuilder,
-    MessageFlags,
-    AttachmentBuilder,
-} = require("discord.js");
-const fs        = require("fs");
-const path      = require("path");
-const mongoose  = require("mongoose");
+const { Client, Collection, GatewayIntentBits, ActivityType, EmbedBuilder, MessageFlags, AttachmentBuilder } = require("discord.js");
+const fs = require("fs");
+const path = require("path");
+const mongoose = require("mongoose");
 
-const { loadCommands }                                    = require("./utils/loadCommands.js");
-const { logger }                                          = require("./utils/logger.js");
-const { buildNpComponents, buildDisabledNpComponents }    = require("./utils/npButtonUtils.js");
-const { startTimer, clearTimer, INACTIVITY_MS }           = require("./utils/inactivityTimer.js");
-const { buildNpImageCard }                                = require("./utils/npImageCard.js");
-const RecentTrack                                         = require("./utils/database/musicDb.js");
+const { loadCommands } = require("./utils/loadCommands.js");
+const { logger } = require("./utils/logger.js");
+const { buildNpComponents, buildDisabledNpComponents } = require("./utils/npButtonUtils.js");
+const { startTimer, clearTimer, INACTIVITY_MS } = require("./utils/inactivityTimer.js");
+const { buildNpImageCard } = require("./utils/npImageCard.js");
+const RecentTrack = require("./utils/database/musicDb.js");
 
 const COLORS = {
-    ERROR:   "FF0000",
+    ERROR: "FF0000",
     SUCCESS: "50C878",
     DEFAULT: "FF7F50",
 };
@@ -61,7 +53,7 @@ const client = new Client({
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildVoiceStates,
         GatewayIntentBits.GuildMessages,
-        GatewayIntentBits.GuildMembers,   // Required for guildMemberAdd to fire.
+        GatewayIntentBits.GuildMembers, // Required for guildMemberAdd to fire.
         GatewayIntentBits.MessageContent, // Must also enable "Server Members Intent" in the Discord Developer Portal.
     ],
 });
@@ -71,12 +63,12 @@ loadCommands(client, path.join(__dirname, "commands"));
 
 client.events = new Collection();
 
-const eventsPath  = path.join(__dirname, "events");
-const eventFiles  = fs.readdirSync(eventsPath).filter((file) => file.endsWith(".js"));
+const eventsPath = path.join(__dirname, "events");
+const eventFiles = fs.readdirSync(eventsPath).filter((file) => file.endsWith(".js"));
 
 for (const file of eventFiles) {
     const filePath = path.join(eventsPath, file);
-    const event    = require(filePath);
+    const event = require(filePath);
 
     if (event.once) {
         client.once(event.name, (...args) => event.execute(...args));
@@ -89,10 +81,10 @@ client.lavalink = new LavalinkManager({
     nodes: [
         {
             authorization: process.env.LAVA_PASS,
-            host:          process.env.LAVA_HOST,
-            port:          Number(process.env.LAVA_PORT),
-            secure:        process.env.LAVA_SECURE === "true",
-            id:            "Dreama Node",
+            host: process.env.LAVA_HOST,
+            port: Number(process.env.LAVA_PORT),
+            secure: process.env.LAVA_SECURE === "true",
+            id: "Dreama Node",
         },
     ],
     sendToShard: (guildId, payload) => {
@@ -101,27 +93,24 @@ client.lavalink = new LavalinkManager({
     },
     autoSkip: true,
     playerOptions: {
-        defaultSearchPlatform:              "ytmsearch",
-        defaultVolume:                      100,
-        clientBasedPositionUpdateInterval:  50,
-        applyVolumeAsFilter:                false,
-        volumeDecrementer:                  1,
-        useUnresolvedData:                  true,
+        defaultSearchPlatform: "ytmsearch", //Can be ytsearch and scsearch
+        defaultVolume: 100,
+        clientBasedPositionUpdateInterval: 50,
+        applyVolumeAsFilter: false,
+        volumeDecrementer: 1,
+        useUnresolvedData: true,
         onDisconnect: {
-            autoReconnect:  true,
-            destroyPlayer:  false,
+            autoReconnect: true,
+            destroyPlayer: false,
         },
     },
     client: {
-        id:       process.env.CLIENT_ID,
+        id: process.env.CLIENT_ID,
         username: process.env.USERNAME || "Dreama",
     },
 });
 
 client.on("raw", (d) => client.lavalink.sendRawData(d));
-
-
-// ── Node events ─────────────────────────────────────────────────────────────
 
 client.lavalink.nodeManager.on("connect", (node) => {
     console.log(`[Node] ✅ Node "${node.id}" is connected!`);
@@ -138,9 +127,6 @@ client.lavalink.nodeManager.on("reconnecting", (node) => {
 client.lavalink.nodeManager.on("error", (node, error) => {
     logger.error(`[Node] ‼️ Node "${node.id}" encountered an error`, error);
 });
-
-
-// ── Player lifecycle events ──────────────────────────────────────────────────
 
 client.lavalink.on("playerCreate", (player) => {
     console.log(`[Events] ✅ Event "playerCreate" fired for guild ${player.guildId}`);
@@ -199,15 +185,14 @@ client.lavalink.on("trackStart", async (player, track) => {
 
     clearTimer(player.guildId);
 
-    // Save to recent tracks history
     RecentTrack.create({
-        guildId:     player.guildId,
-        title:       track.info.title,
-        uri:         track.info.uri,
-        author:      track.info.author      || "Unknown",
-        duration:    track.info.duration    || 0,
-        sourceName:  track.info.sourceName  || "unknown",
-        artworkUrl:  track.info.artworkUrl  || null,
+        guildId: player.guildId,
+        title: track.info.title,
+        uri: track.info.uri,
+        author: track.info.author || "Unknown",
+        duration: track.info.duration || 0,
+        sourceName: track.info.sourceName || "unknown",
+        artworkUrl: track.info.artworkUrl || null,
         requestedBy: track.requester?.username ?? "Unknown",
     }).catch((err) => logger.error("Failed to save recent track to database", err));
 
@@ -220,7 +205,7 @@ client.lavalink.on("trackStart", async (player, track) => {
         player.npMessage = null;
     }
 
-    player.npTrack  = track;
+    player.npTrack = track;
     player.npClient = client;
 
     const channel = await getChannel(player.textChannelId);
@@ -240,7 +225,6 @@ client.lavalink.on("trackStart", async (player, track) => {
         logger.error("Failed to send trackStart image card", err);
     }
 
-    // Then send the interactive NP container with buttons
     const npMessage = await channel.send({
         components: buildNpComponents(player, track, client),
         flags: MessageFlags.IsComponentsV2,
@@ -290,11 +274,11 @@ client.lavalink.on("trackError", async (player, track, payload) => {
     const channel = await getChannel(player.textChannelId);
     if (!channel) return;
 
-    const footer     = process.env.FOOTER || "Dreama";
+    const footer = process.env.FOOTER || "Dreama";
     const sourceName = track.info.sourceName ?? "unknown";
 
     const pluginRequiredSources = ["deezer", "applemusic", "tidal", "spotify"];
-    const isUnsupportedSource   = pluginRequiredSources.includes(sourceName.toLowerCase());
+    const isUnsupportedSource = pluginRequiredSources.includes(sourceName.toLowerCase());
 
     const description = isUnsupportedSource
         ? `**[${track.info.title}](${track.info.uri})** could not be streamed.\n\n**${sourceName.charAt(0).toUpperCase() + sourceName.slice(1)}** requires a Lavalink source plugin. Please contact your bot administrator.`
@@ -312,9 +296,6 @@ client.lavalink.on("trackError", async (player, track, payload) => {
     }).catch((err) => logger.error("Failed to send trackError embed", err));
 });
 
-
-// ── Queue end & inactivity ───────────────────────────────────────────────────
-
 client.lavalink.on("queueEnd", async (player) => {
     console.log(`[Events] ✅ Event "queueEnd" fired`);
 
@@ -331,8 +312,8 @@ client.lavalink.on("queueEnd", async (player) => {
         player.npMessage = null;
     }
 
-    const channel  = await getChannel(player.textChannelId);
-    const footer   = process.env.FOOTER || "Dreama";
+    const channel = await getChannel(player.textChannelId);
+    const footer = process.env.FOOTER || "Dreama";
     const autoplay = player.get("autoplay") ?? false;
 
     if (autoplay) {
@@ -384,7 +365,7 @@ client.lavalink.on("queueEnd", async (player) => {
             activeChannel.send({
                 embeds: [
                     new EmbedBuilder()
-                        .setColor(COLORS.ERROR)
+                        .setColor(COLORS.DEFAULT)
                         .setTitle("👋 Leaving Due to Inactivity")
                         .setDescription(`No song was played for **${minutesLeft} minutes**. Goodbye!`)
                         .setFooter({ text: footer })
@@ -396,9 +377,6 @@ client.lavalink.on("queueEnd", async (player) => {
         await player.destroy();
     });
 });
-
-
-// ── Bot ready ────────────────────────────────────────────────────────────────
 
 client.once("clientReady", () => {
     console.log(`[Initializer] Initializing command(s) & event(s)...`);
