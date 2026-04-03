@@ -1,30 +1,28 @@
 require("dotenv").config();
-const {
-    ContainerBuilder,
-    ButtonBuilder,
-    ButtonStyle,
-    MessageFlags,
-    SeparatorSpacingSize,
-} = require("discord.js");
+const { ContainerBuilder, ButtonBuilder, ButtonStyle, MessageFlags, SeparatorSpacingSize } = require("discord.js");
 const { formatDuration } = require("./formatDuration.js");
 
 const MAX_DISPLAY = 8;
-const FIELD_MAX   = 1024;
+const FIELD_MAX = 1024;
 
 function truncate(str, max) {
     return str.length > max ? str.slice(0, max - 3) + "..." : str;
 }
 
 function buildQueueComponents(player, page, client) {
-    const avatarURL  = client?.user?.displayAvatarURL({ dynamic: true, size: 256 }) ?? "https://cdn.discordapp.com/embed/avatars/0.png";
-    const tracks     = player.queue.tracks;
-    const current    = player.queue.current;
-    const total      = tracks.length;
+    const avatarURL = client?.user?.displayAvatarURL({ dynamic: true, size: 256 }) ?? "https://cdn.discordapp.com/embed/avatars/0.png";
+    const tracks = player.queue.tracks;
+    const current = player.queue.current;
+    const total = tracks.length;
     const totalPages = Math.max(1, Math.ceil(total / MAX_DISPLAY));
-    const autoplay   = player.get("autoplay") ?? false;
+    const autoplay = player.get("autoplay") ?? false;
     const repeatMode = player.repeatMode ?? "off";
 
-    const repeatLabels = { off: "Off", track: "🔂 Track", queue: "🔁 Queue" };
+    const repeatLabels = { 
+        off: "Off", 
+        track: "🔂 Track", 
+        queue: "🔁 Queue" 
+    };
 
     const nowPlayingText = current
         ? `**[${truncate(current.info.title, 60)}](${current.info.uri})**\n` +
@@ -41,7 +39,7 @@ function buildQueueComponents(player, page, client) {
         let used = 0;
 
         for (const [i, track] of slice.entries()) {
-            const pos  = start + i + 1;
+            const pos = start + i + 1;
             const line = `\`${pos}.\` **${truncate(track.info.title, 50)}**\n   ${truncate(track.info.author, 30)} · ${formatDuration(track.info.duration)} · ${track.requester?.username ?? "Unknown"}\n`;
 
             if (used + line.length > FIELD_MAX - 20) {
@@ -124,9 +122,9 @@ async function handleQueueButton(interaction, client) {
         });
     }
 
-    const parts      = interaction.customId.split("_");
-    const dir        = parts[1];
-    const curPage    = parseInt(parts[2], 10);
+    const parts = interaction.customId.split("_");
+    const dir = parts[1];
+    const curPage = parseInt(parts[2], 10);
     const totalPages = Math.max(1, Math.ceil(player.queue.tracks.length / MAX_DISPLAY));
 
     let nextPage = curPage;
