@@ -1,5 +1,11 @@
 require("dotenv").config();
-const { SlashCommandBuilder, EmbedBuilder, ContainerBuilder, MessageFlags, SeparatorSpacingSize } = require("discord.js");
+const {
+    SlashCommandBuilder,
+    EmbedBuilder,
+    ContainerBuilder,
+    MessageFlags,
+    SeparatorSpacingSize,
+} = require("discord.js");
 const { formatDuration } = require("../../utils/formatDuration.js");
 const { syncNpMessage } = require("../../utils/npButtonUtils.js");
 const { logger } = require("../../utils/logger.js");
@@ -7,7 +13,7 @@ const { logger } = require("../../utils/logger.js");
 const COLORS = {
     DEFAULT: "FF7F50",
     SUCCESS: "50C878",
-    ERROR: "FF0000",
+    ERROR:   "FF0000",
 };
 
 module.exports = {
@@ -22,14 +28,16 @@ module.exports = {
         ),
 
     async execute(interaction) {
-        const client = interaction.client;
-        const member = interaction.member;
-        const guild = interaction.guild;
+        const client       = interaction.client;
+        const member       = interaction.member;
+        const guild        = interaction.guild;
         const voiceChannel = member.voice?.channel;
-        const footer = process.env.FOOTER || "Dreama";
-        const avatarURL = client?.user?.displayAvatarURL({ dynamic: true, size: 256 })
+        const footer       = process.env.FOOTER || "Dreama";
+        const avatarURL    = client?.user?.displayAvatarURL({ dynamic: true, size: 256 })
             ?? "https://cdn.discordapp.com/embed/avatars/0.png";
-        const query = interaction.options.getString("query");
+        const query        = interaction.options.getString("query");
+
+        // ── Pre-defer validation ──────────────────────────────────────────────
 
         if (!voiceChannel) {
             return interaction.reply({
@@ -75,62 +83,86 @@ module.exports = {
             });
         }
 
+        if (!player.queue.current) {
+            return interaction.reply({
+                embeds: [
+                    new EmbedBuilder()
+                        .setColor(COLORS.ERROR)
+                        .setTitle("❌ Nothing Is Playing!")
+                        .setDescription("There is no track currently playing to queue after.")
+                        .setFooter({ text: footer })
+                        .setTimestamp(),
+                ],
+                flags: MessageFlags.Ephemeral,
+            });
+        }
+
+        // ── Defer ─────────────────────────────────────────────────────────────
+        // Everything past this point must use editReply(), not reply().
+
         await interaction.deferReply();
+
+        // ── Search ────────────────────────────────────────────────────────────
 
         let result;
         try {
             result = await player.search({ query }, interaction.user);
         } catch (err) {
-            logger.error("Search failed in /playnext", err);
+            logger.error("[PlayNext] Search failed", err);
             return interaction.editReply({
                 embeds: [
                     new EmbedBuilder()
                         .setColor(COLORS.ERROR)
                         .setTitle("❌ Search Failed")
-                        .setDescription(`Could not retrieve results for **${query}**.`)
+                        .setDescription(`Could not retrieve results for **${query}**. The source may be unavailable or rate-limited.`)
                         .setFooter({ text: footer })
                         .setTimestamp(),
                 ],
             });
         }
 
-        if (!result?.tracks?.length || result.loadType === "empty" || result.loadType === "error") {
+        if (result.loadType === "error" || !result?.tracks?.length || result.loadType === "empty") {
             return interaction.editReply({
                 embeds: [
                     new EmbedBuilder()
                         .setColor(COLORS.ERROR)
                         .setTitle("❌ No Results Found")
-                        .setDescription(`No results found for **${query}**.`)
+                        .setDescription(`No results were found for **${query}**.`)
                         .setFooter({ text: footer })
                         .setTimestamp(),
                 ],
             });
         }
 
+        // ── Queue and respond ─────────────────────────────────────────────────
+
         const track = result.tracks[0];
 
-        // Insert the track at position 0 of the upcoming queue (right after current)
+        // Insert at position 0 of the upcoming queue so it plays right after
+        // the current track, regardless of what else is queued.
         player.queue.tracks.unshift(track);
 
+        // Refresh the NP card buttons to reflect the updated queue state
+        // (e.g. Skip is no longer disabled now that there's a next track).
         await syncNpMessage(player);
 
         const thumbnailUrl = track.info.artworkUrl || avatarURL;
 
         const container = new ContainerBuilder()
             .setAccentColor(0xFF7F50)
-            .addSectionComponents((section) =>
+            .addSectionComponents(section =>
                 section
-                    .addTextDisplayComponents((text) =>
+                    .addTextDisplayComponents(text =>
                         text.setContent(
                             `## ⏩ Playing Next!\n**[${track.info.title}](${track.info.uri})**`
                         )
                     )
-                    .setThumbnailAccessory((thumb) => thumb.setURL(thumbnailUrl))
+                    .setThumbnailAccessory(thumb => thumb.setURL(thumbnailUrl))
             )
-            .addSeparatorComponents((sep) =>
+            .addSeparatorComponents(sep =>
                 sep.setDivider(true).setSpacing(SeparatorSpacingSize.Small)
             )
-            .addTextDisplayComponents((text) =>
+            .addTextDisplayComponents(text =>
                 text.setContent(
                     `**Author:** ${track.info.author || "Unknown"}\n` +
                     `**Duration:** ${formatDuration(track.info.duration)}\n` +

@@ -1,5 +1,10 @@
 require("dotenv").config();
-const { SlashCommandBuilder, EmbedBuilder, AttachmentBuilder, MessageFlags } = require("discord.js");
+const {
+    SlashCommandBuilder,
+    EmbedBuilder,
+    AttachmentBuilder,
+    MessageFlags,
+} = require("discord.js");
 const { buildSearchCard } = require("../../utils/searchCard.js");
 const { storeSearchData, buildSearchRows, buildDisabledSearchRows } = require("../../utils/searchButtonUtils.js");
 const { logger } = require("../../utils/logger.js");
@@ -7,10 +12,10 @@ const GuildConfig = require("../../utils/database/configDb.js");
 
 const COLORS = {
     DEFAULT: "FF7F50",
-    ERROR: "FF0000",
+    ERROR:   "FF0000",
 };
 
-const BUTTON_TIMEOUT_MS = 5 * 60 * 1000;
+const BUTTON_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -24,12 +29,14 @@ module.exports = {
         ),
 
     async execute(interaction) {
-        const client = interaction.client;
-        const member = interaction.member;
-        const guild = interaction.guild;
+        const client       = interaction.client;
+        const member       = interaction.member;
+        const guild        = interaction.guild;
         const voiceChannel = member.voice?.channel;
-        const footer = process.env.FOOTER || "Dreama";
-        const query = interaction.options.getString("query");
+        const footer       = process.env.FOOTER || "Dreama";
+        const query        = interaction.options.getString("query");
+
+        // ── Pre-defer validation ──────────────────────────────────────────────
 
         if (!voiceChannel) {
             return interaction.reply({
@@ -60,8 +67,11 @@ module.exports = {
             });
         }
 
+        // Re-use the GuildConfig already fetched by interactionCreate.js so we
+        // don't burn a second DB round-trip before deferReply is called.
         const guildConfig = interaction._guildConfig
             ?? await GuildConfig.findOne({ guildId: guild.id }).catch(() => null);
+
         if (guildConfig?.musicVoice && voiceChannel.id !== guildConfig.musicVoice) {
             return interaction.reply({
                 embeds: [
@@ -81,7 +91,7 @@ module.exports = {
                 embeds: [
                     new EmbedBuilder()
                         .setColor(COLORS.ERROR)
-                        .setTitle("❌ Internal Error Occurred.")
+                        .setTitle("❌ No Nodes Available")
                         .setDescription("No music nodes are available right now. Please try again later.")
                         .setFooter({ text: footer })
                         .setTimestamp(),
@@ -90,36 +100,45 @@ module.exports = {
             });
         }
 
+        // ── Defer ─────────────────────────────────────────────────────────────
+        // Everything past this point must use editReply(), not reply().
+
         await interaction.deferReply();
 
+        // ── Player setup ──────────────────────────────────────────────────────
+
         const player = client.lavalink.createPlayer({
-            guildId: guild.id,
+            guildId:        guild.id,
             voiceChannelId: voiceChannel.id,
-            textChannelId: interaction.channel.id,
-            selfDeaf: true,
+            textChannelId:  interaction.channel.id,
+            selfDeaf:       true,
         });
 
-        if (!player.connected)
-            await player.connect();
+        if (!player.connected) await player.connect();
+
+        // ── Search ────────────────────────────────────────────────────────────
 
         let result;
         try {
             result = await player.search({ query }, interaction.user);
         } catch (err) {
-            logger.error("Search failed in /search", err);
+            logger.error("[Search] Search failed", err);
             return interaction.editReply({
                 embeds: [
                     new EmbedBuilder()
                         .setColor(COLORS.ERROR)
                         .setTitle("❌ Search Failed")
-                        .setDescription(`Could not retrieve results for **${query}**. The source may be unavailable, unsupported, or rate-limited by the Lavalink server.`)
+                        .setDescription(
+                            `Could not retrieve results for **${query}**.\n` +
+                            "The source may be unavailable or rate-limited by the Lavalink server."
+                        )
                         .setFooter({ text: footer })
                         .setTimestamp(),
                 ],
             });
         }
 
-        if (!result?.tracks?.length || result.loadType === "empty" || result.loadType === "error") {
+        if (result.loadType === "error" || !result?.tracks?.length || result.loadType === "empty") {
             return interaction.editReply({
                 embeds: [
                     new EmbedBuilder()
@@ -132,31 +151,43 @@ module.exports = {
             });
         }
 
+        // ── Build and send the result card ────────────────────────────────────
+
         const tracks = result.tracks.slice(0, 5);
 
-        const imageBuffer = await buildSearchCard(tracks, query).catch(() => null);
-        const imageAttachment = imageBuffer ? new AttachmentBuilder(imageBuffer, { name: "search.png" }) : null;
+        // Build the visual search card image. If canvas fails for any reason,
+        // imageBuffer is null and we fall back to a text-only embed.
+        const imageBuffer     = await buildSearchCard(tracks, query).catch(() => null);
+        const imageAttachment = imageBuffer
+            ? new AttachmentBuilder(imageBuffer, { name: "search.png" })
+            : null;
 
         const searchEmbed = new EmbedBuilder()
             .setColor(COLORS.DEFAULT)
             .setTitle("🔍 Search Results")
-            .setDescription(`Showing **${tracks.length}** result(s) for **${query}**.\nSelect a song below or click **Play All** to queue everything and click **Cancel** when you want to cancel the search.\n\n⏳ These buttons will expire in **5 minutes**.`)
+            .setDescription(
+                `Showing **${tracks.length}** result(s) for **${query}**.\n` +
+                "Select a song below, click **Play All** to queue everything, " +
+                "or click **Cancel** to dismiss.\n\n" +
+                "⏳ These buttons expire in **5 minutes**."
+            )
             .setFooter({ text: footer })
             .setTimestamp();
 
-        if (imageAttachment)
-            searchEmbed.setImage("attachment://search.png");
+        if (imageAttachment) searchEmbed.setImage("attachment://search.png");
 
         const rows = buildSearchRows(tracks);
 
-        const sendOptions = { embeds: [searchEmbed], components: rows };
-        if (imageAttachment)
-            sendOptions.files = [imageAttachment];
+        const replyOptions = { embeds: [searchEmbed], components: rows };
+        if (imageAttachment) replyOptions.files = [imageAttachment];
 
-        const sentMessage = await interaction.editReply(sendOptions);
+        const sentMessage = await interaction.editReply(replyOptions);
 
+        // Store the track list so the button handler can access it later.
         storeSearchData(sentMessage.id, { tracks, query });
 
+        // After the timeout, disable all buttons so users get clear visual
+        // feedback that the search session has expired.
         setTimeout(async () => {
             await sentMessage.edit({ components: buildDisabledSearchRows(tracks) }).catch(() => null);
         }, BUTTON_TIMEOUT_MS);
