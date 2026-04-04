@@ -1,10 +1,5 @@
 require("dotenv").config();
-const {
-    ContainerBuilder,
-    StringSelectMenuBuilder,
-    MessageFlags,
-    SeparatorSpacingSize,
-} = require("discord.js");
+const { ContainerBuilder, StringSelectMenuBuilder, MessageFlags, SeparatorSpacingSize } = require("discord.js");
 const { formatDuration } = require("./formatDuration.js");
 const { syncNpMessage } = require("./npButtonUtils.js");
 
@@ -316,7 +311,7 @@ function buildRecommendComponents(client) {
 
 function buildRecommendResultComponents(track, genre, wasPlaying, avatarURL, interaction) {
     const thumbnailUrl = track.info.artworkUrl || avatarURL;
-    const options      = buildMenuOptions();
+    const options = buildMenuOptions();
 
     const container = new ContainerBuilder()
         .setAccentColor(0xFF7F50)
@@ -336,8 +331,8 @@ function buildRecommendResultComponents(track, genre, wasPlaying, avatarURL, int
         )
         .addTextDisplayComponents((text) =>
             text.setContent(
-                `**Author:** ${track.info.author || "Unknown"}   ·   ` +
-                `**Duration:** ${formatDuration(track.info.duration)}   ·   ` +
+                `**Author:** ${track.info.author || "Unknown"}\n` +
+                `**Duration:** ${formatDuration(track.info.duration)}\n` +
                 `**Requested by:** ${interaction.user}`
             )
         )
@@ -387,9 +382,9 @@ function buildRecommendErrorComponents(message, avatarURL) {
 
 async function handleRecommendSelect(interaction, client) {
     const avatarURL = client?.user?.displayAvatarURL({ dynamic: true, size: 256 }) ?? "https://cdn.discordapp.com/embed/avatars/0.png";
-    const footer    = process.env.FOOTER || "Dreama";
-    const genreKey  = interaction.values[0];
-    const genre     = GENRES[genreKey];
+    const footer = process.env.FOOTER || "Dreama";
+    const genreKey = interaction.values[0];
+    const genre = GENRES[genreKey];
 
     if (!genre) {
         return interaction.reply({
@@ -469,8 +464,8 @@ async function handleRecommendSelect(interaction, client) {
             });
         }
 
-        const pickCount  = Math.min(result.tracks.length, 3);
-        const track      = result.tracks[Math.floor(Math.random() * pickCount)];
+        const pickCount = Math.min(result.tracks.length, 3);
+        const track = result.tracks[Math.floor(Math.random() * pickCount)];
         const wasPlaying = player.playing || player.paused;
 
         await player.queue.add(track);
