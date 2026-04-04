@@ -4,7 +4,7 @@ const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 const COLORS = {
     DEFAULT: "FF7F50",
     SUCCESS: "50C878",
-    ERROR: "FF0000",
+    ERROR:   "FF0000",
 };
 
 module.exports = {
@@ -15,31 +15,34 @@ module.exports = {
     async execute(interaction) {
         const footer = process.env.FOOTER || "Dreama";
 
+        // Measure the round-trip time for deferReply itself — this is a more
+        // reliable API latency figure than subtracting timestamps after the
+        // fact, and it avoids the extra fetchReply() call that could throw
+        // and leave the interaction stuck in the "thinking..." state.
+        const before = Date.now();
         await interaction.deferReply();
+        const apiLatency = Date.now() - before;
 
-        const sent = await interaction.fetchReply();
-        const apiPing = sent.createdTimestamp - interaction.createdTimestamp;
-        const wsPing = interaction.client.ws.ping;
+        const wsLatency = interaction.client.ws.ping;
 
-        const pingEmbed = new EmbedBuilder()
+        const embed = new EmbedBuilder()
             .setColor(COLORS.DEFAULT)
             .setTitle("🏓 Pong!")
             .addFields(
-                { 
-                    name: "🚀 API Latency",       
-                    value: `\`${apiPing}ms\``,  
-                    inline: true 
+                {
+                    name:   "🚀 API Latency",
+                    value:  `\`${apiLatency}ms\``,
+                    inline: true,
                 },
-                { 
-                    name: "🔗 WebSocket Latency", 
-                    value: `\`${wsPing}ms\``,   
-                    inline: true 
+                {
+                    name:   "🔗 WebSocket Latency",
+                    value:  `\`${wsLatency}ms\``,
+                    inline: true,
                 },
             )
             .setFooter({ text: footer })
             .setTimestamp();
 
-        await interaction.editReply({ embeds: [pingEmbed] });
+        await interaction.editReply({ embeds: [embed] });
     },
 };
-          
