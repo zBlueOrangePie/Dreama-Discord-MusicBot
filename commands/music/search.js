@@ -1,10 +1,5 @@
 require("dotenv").config();
-const {
-    SlashCommandBuilder,
-    EmbedBuilder,
-    AttachmentBuilder,
-    MessageFlags,
-} = require("discord.js");
+const { SlashCommandBuilder, EmbedBuilder, AttachmentBuilder, MessageFlags } = require("discord.js");
 const { buildSearchCard } = require("../../utils/searchCard.js");
 const { storeSearchData, buildSearchRows, buildDisabledSearchRows } = require("../../utils/searchButtonUtils.js");
 const { logger } = require("../../utils/logger.js");
@@ -12,7 +7,7 @@ const GuildConfig = require("../../utils/database/configDb.js");
 
 const COLORS = {
     DEFAULT: "FF7F50",
-    ERROR:   "FF0000",
+    ERROR: "FF0000",
 };
 
 const BUTTON_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes
@@ -29,14 +24,12 @@ module.exports = {
         ),
 
     async execute(interaction) {
-        const client       = interaction.client;
-        const member       = interaction.member;
-        const guild        = interaction.guild;
+        const client = interaction.client;
+        const member = interaction.member;
+        const guild = interaction.guild;
         const voiceChannel = member.voice?.channel;
-        const footer       = process.env.FOOTER || "Dreama";
-        const query        = interaction.options.getString("query");
-
-        // ── Pre-defer validation ──────────────────────────────────────────────
+        const footer = process.env.FOOTER || "Dreama";
+        const query = interaction.options.getString("query");
 
         if (!voiceChannel) {
             return interaction.reply({
@@ -67,8 +60,6 @@ module.exports = {
             });
         }
 
-        // Re-use the GuildConfig already fetched by interactionCreate.js so we
-        // don't burn a second DB round-trip before deferReply is called.
         const guildConfig = interaction._guildConfig
             ?? await GuildConfig.findOne({ guildId: guild.id }).catch(() => null);
 
@@ -100,23 +91,16 @@ module.exports = {
             });
         }
 
-        // ── Defer ─────────────────────────────────────────────────────────────
-        // Everything past this point must use editReply(), not reply().
-
         await interaction.deferReply();
 
-        // ── Player setup ──────────────────────────────────────────────────────
-
         const player = client.lavalink.createPlayer({
-            guildId:        guild.id,
+            guildId: guild.id,
             voiceChannelId: voiceChannel.id,
-            textChannelId:  interaction.channel.id,
-            selfDeaf:       true,
+            textChannelId: interaction.channel.id,
+            selfDeaf: true,
         });
 
         if (!player.connected) await player.connect();
-
-        // ── Search ────────────────────────────────────────────────────────────
 
         let result;
         try {
@@ -151,13 +135,8 @@ module.exports = {
             });
         }
 
-        // ── Build and send the result card ────────────────────────────────────
-
         const tracks = result.tracks.slice(0, 5);
-
-        // Build the visual search card image. If canvas fails for any reason,
-        // imageBuffer is null and we fall back to a text-only embed.
-        const imageBuffer     = await buildSearchCard(tracks, query).catch(() => null);
+        const imageBuffer = await buildSearchCard(tracks, query).catch(() => null);
         const imageAttachment = imageBuffer
             ? new AttachmentBuilder(imageBuffer, { name: "search.png" })
             : null;
@@ -182,12 +161,8 @@ module.exports = {
         if (imageAttachment) replyOptions.files = [imageAttachment];
 
         const sentMessage = await interaction.editReply(replyOptions);
-
-        // Store the track list so the button handler can access it later.
         storeSearchData(sentMessage.id, { tracks, query });
 
-        // After the timeout, disable all buttons so users get clear visual
-        // feedback that the search session has expired.
         setTimeout(async () => {
             await sentMessage.edit({ components: buildDisabledSearchRows(tracks) }).catch(() => null);
         }, BUTTON_TIMEOUT_MS);
