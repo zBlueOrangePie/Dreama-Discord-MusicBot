@@ -9,7 +9,7 @@ module.exports = {
 
     async execute(interaction) {
         const client = interaction.client;
-        const guild  = interaction.guild;
+        const guild = interaction.guild;
         const footer = process.env.FOOTER || "Dreama";
 
         const player = client.lavalink.getPlayer(guild.id);
