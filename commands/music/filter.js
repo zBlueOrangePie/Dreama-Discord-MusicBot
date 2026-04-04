@@ -4,7 +4,7 @@ const { SlashCommandBuilder, EmbedBuilder, MessageFlags } = require("discord.js"
 const COLORS = {
     DEFAULT: "FF7F50",
     SUCCESS: "50C878",
-    ERROR:   "FF0000",
+    ERROR: "FF0000",
 };
 
 // Each preset's `apply` function sets the filter data directly on
@@ -21,16 +21,46 @@ const FILTER_PRESETS = {
         label: "🔊 Bass Boost",
         apply: async (filterManager) => {
             filterManager.data.equalizer = [
-                { band: 0, gain:  0.6  },
-                { band: 1, gain:  0.67 },
-                { band: 2, gain:  0.67 },
-                { band: 3, gain:  0.4  },
-                { band: 4, gain:  0.0  },
-                { band: 5, gain: -0.5  },
-                { band: 6, gain: -0.1  },
-                { band: 7, gain: -0.1  },
-                { band: 8, gain: -0.1  },
-                { band: 9, gain: -0.1  },
+                { 
+                    band: 0, 
+                    gain:  0.6  
+                },
+                { 
+                    band: 1, 
+                    gain:  0.67 
+                },
+                { 
+                    band: 2, 
+                    gain:  0.67 
+                },
+                { 
+                    band: 3, 
+                    gain:  0.4  
+                },
+                { 
+                    band: 4, 
+                    gain:  0.0  
+                },
+                { 
+                    band: 5, 
+                    gain: -0.5  
+                },
+                { 
+                    band: 6, 
+                    gain: -0.1  
+                },
+                { 
+                    band: 7, 
+                    gain: -0.1  
+                },
+                { 
+                    band: 8, 
+                    gain: -0.1  
+                },
+                { 
+                    band: 9, 
+                    gain: -0.1  
+                },
             ];
             await filterManager.applyPlayerFilters();
         },
@@ -56,16 +86,46 @@ const FILTER_PRESETS = {
         label: "🎵 Pop",
         apply: async (filterManager) => {
             filterManager.data.equalizer = [
-                { band: 0, gain: -0.05 },
-                { band: 1, gain:  0.2  },
-                { band: 2, gain:  0.2  },
-                { band: 3, gain:  0.1  },
-                { band: 4, gain:  0.0  },
-                { band: 5, gain: -0.1  },
-                { band: 6, gain: -0.1  },
-                { band: 7, gain: -0.1  },
-                { band: 8, gain:  0.0  },
-                { band: 9, gain:  0.0  },
+                { 
+                    band: 0, 
+                    gain: -0.05 
+                },
+                { 
+                    band: 1, 
+                    gain:  0.2  
+                },
+                {
+                    band: 2,
+                    gain:  0.2
+                },
+                { 
+                    band: 3, 
+                    gain:  0.1 
+                },
+                {
+                    band: 4, 
+                    gain:  0.0  
+                },
+                { 
+                    band: 5, 
+                    gain: -0.1 
+                },
+                { 
+                    band: 6, 
+                    gain: -0.1 
+                },
+                { 
+                    band: 7,
+                    gain: -0.1 
+                },
+                { 
+                    band: 8,
+                    gain:  0.0  
+                },
+                { 
+                    band: 9, 
+                    gain:  0.0  
+                },
             ];
             await filterManager.applyPlayerFilters();
         },
@@ -83,16 +143,46 @@ const FILTER_PRESETS = {
         label: "🔔 Treble Boost",
         apply: async (filterManager) => {
             filterManager.data.equalizer = [
-                { band: 0, gain: -0.3 },
-                { band: 1, gain: -0.2 },
-                { band: 2, gain: -0.1 },
-                { band: 3, gain:  0.0 },
-                { band: 4, gain:  0.1 },
-                { band: 5, gain:  0.2 },
-                { band: 6, gain:  0.3 },
-                { band: 7, gain:  0.4 },
-                { band: 8, gain:  0.4 },
-                { band: 9, gain:  0.4 },
+                { 
+                    band: 0,
+                    gain: -0.3 
+                },
+                { 
+                    band: 1, 
+                    gain: -0.2
+                },
+                {
+                    band: 2, 
+                    gain: -0.1 
+                },
+                { 
+                    band: 3, 
+                    gain:  0.0 
+                },
+                { 
+                    band: 4,
+                    gain:  0.1
+                },
+                {
+                    band: 5, 
+                    gain:  0.2 
+                },
+                { 
+                    band: 6, 
+                    gain:  0.3
+                },
+                {
+                    band: 7,
+                    gain:  0.4
+                },
+                { 
+                    band: 8, 
+                    gain:  0.4 
+                },
+                { 
+                    band: 9,
+                    gain:  0.4
+                },
             ];
             await filterManager.applyPlayerFilters();
         },
@@ -102,9 +192,9 @@ const FILTER_PRESETS = {
         label: "🎤 Karaoke",
         apply: async (filterManager) => {
             filterManager.data.karaoke = {
-                level:       1.0,
-                monoLevel:   1.0,
-                filterBand:  220.0,
+                level: 1.0,
+                monoLevel: 1.0,
+                filterBand: 220.0,
                 filterWidth: 100.0,
             };
             await filterManager.applyPlayerFilters();
@@ -114,7 +204,10 @@ const FILTER_PRESETS = {
     vibrato: {
         label: "〰️ Vibrato",
         apply: async (filterManager) => {
-            filterManager.data.vibrato = { frequency: 4.0, depth: 0.75 };
+            filterManager.data.vibrato = {
+                frequency: 4.0, 
+                depth: 0.75
+            };
             await filterManager.applyPlayerFilters();
         },
     },
@@ -122,7 +215,10 @@ const FILTER_PRESETS = {
     tremolo: {
         label: "🎸 Tremolo",
         apply: async (filterManager) => {
-            filterManager.data.tremolo = { frequency: 4.0, depth: 0.75 };
+            filterManager.data.tremolo = { 
+                frequency: 4.0, 
+                depth: 0.75
+            };
             await filterManager.applyPlayerFilters();
         },
     },
@@ -145,26 +241,56 @@ module.exports = {
                 .setDescription("Choose a filter to apply.")
                 .setRequired(true)
                 .addChoices(
-                    { name: "🔊 Bass Boost",    value: "bassboost" },
-                    { name: "🌙 Nightcore",     value: "nightcore" },
-                    { name: "🌊 Vaporwave",     value: "vaporwave" },
-                    { name: "🎵 Pop",           value: "pop"       },
-                    { name: "🌿 Soft",          value: "soft"      },
-                    { name: "🔔 Treble Boost",  value: "treble"    },
-                    { name: "🎤 Karaoke",       value: "karaoke"   },
-                    { name: "〰️ Vibrato",      value: "vibrato"   },
-                    { name: "🎸 Tremolo",       value: "tremolo"   },
-                    { name: "🔄 Reset Filters", value: "reset"     },
+                    { 
+                        name: "🔊 Bass Boost", 
+                        value: "bassboost"
+                    },
+                    { 
+                        name: "🌙 Nightcore",   
+                        value: "nightcore" 
+                    },
+                    {
+                        name: "🌊 Vaporwave",   
+                        value: "vaporwave"
+                    },
+                    { 
+                        name: "🎵 Pop",    
+                        value: "pop"     
+                    },
+                    { 
+                        name: "🌿 Soft",    
+                        value: "soft"    
+                    },
+                    { 
+                        name: "🔔 Treble Boost",  
+                        value: "treble"  
+                    },
+                    { 
+                        name: "🎤 Karaoke",   
+                        value: "karaoke"  
+                    },
+                    { 
+                        name: "〰️ Vibrato",   
+                        value: "vibrato"  
+                    },
+                    {
+                        name: "🎸 Tremolo",   
+                        value: "tremolo" 
+                    },
+                    { 
+                        name: "🔄 Reset Filters", 
+                        value: "reset"   
+                    },
                 )
         ),
 
     async execute(interaction) {
-        const client       = interaction.client;
-        const member       = interaction.member;
-        const guild        = interaction.guild;
+        const client = interaction.client;
+        const member = interaction.member;
+        const guild = interaction.guild;
         const voiceChannel = member.voice?.channel;
-        const footer       = process.env.FOOTER || "Dreama";
-        const preset       = interaction.options.getString("preset");
+        const footer = process.env.FOOTER || "Dreama";
+        const preset  = interaction.options.getString("preset");
 
         if (!voiceChannel) {
             return interaction.reply({
@@ -226,8 +352,8 @@ module.exports = {
 
         await interaction.deferReply();
 
-        const selected        = FILTER_PRESETS[preset];
-        const filterManager   = player.filterManager;
+        const selected = FILTER_PRESETS[preset];
+        const filterManager = player.filterManager;
 
         // When reapplying (not reset), clear the current filter data first
         // so the new preset starts from a clean state.
@@ -254,7 +380,7 @@ module.exports = {
         return interaction.editReply({
             embeds: [
                 new EmbedBuilder()
-                    .setColor(COLORS.SUCCESS)
+                    .setColor(COLORS.DEFAULT)
                     .setTitle("🎛️ Filter Applied")
                     .setDescription(
                         preset === "reset"
