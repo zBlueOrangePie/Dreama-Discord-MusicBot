@@ -9,8 +9,8 @@ const { handleRemoveTrackSelect } = require("../commands/music/removetrack.js");
 const { handleAddTrackSelect } = require("../commands/music/addtrack.js");
 const GuildConfig = require("../utils/database/configDb.js");
 
-const NP_BUTTON_IDS = ["np_pause_resume", "np_skip", "np_stop", "np_repeat", "np_autoplay"];
-const QUEUE_BUTTON_PREFIX = "queue_";
+const NP_BUTTON_IDS        = ["np_pause_resume", "np_skip", "np_stop", "np_repeat", "np_autoplay"];
+const QUEUE_BUTTON_PREFIX  = "queue_";
 const SEARCH_BUTTON_PREFIX = "search_track_";
 const PLAYLIST_VIEW_PREFIX = "playlist_view_";
 
@@ -48,6 +48,7 @@ module.exports = {
     async execute(interaction) {
         const client = interaction.client;
 
+        // ── String select menus ─────────────────────────────────────────
         if (interaction.isStringSelectMenu()) {
             const id = interaction.customId;
 
@@ -66,6 +67,7 @@ module.exports = {
             return;
         }
 
+        // ── Buttons ─────────────────────────────────────────────────────
         if (interaction.isButton()) {
             const id = interaction.customId;
 
@@ -88,6 +90,7 @@ module.exports = {
             return;
         }
 
+        // ── Slash commands ──────────────────────────────────────────────
         if (!interaction.isChatInputCommand()) return;
 
         const command = client.commands.get(interaction.commandName);
@@ -97,6 +100,7 @@ module.exports = {
             return;
         }
 
+        // Music channel enforcement
         if (MUSIC_COMMANDS.has(interaction.commandName)) {
             try {
                 const config = await GuildConfig.findOne({ guildId: interaction.guildId });

@@ -1,5 +1,12 @@
 require("dotenv").config();
-const { Events, ContainerBuilder, ButtonBuilder, ButtonStyle, MessageFlags, SeparatorSpacingSize } = require("discord.js");
+const {
+    Events,
+    ContainerBuilder,
+    ButtonBuilder,
+    ButtonStyle,
+    MessageFlags,
+    SeparatorSpacingSize,
+} = require("discord.js");
 
 // IMPORTANT: For this event to fire, you MUST:
 // 1. Enable "Server Members Intent" in your Discord Developer Portal (Bot settings).
@@ -11,7 +18,7 @@ module.exports = {
     once: false,
 
     async execute(member) {
-        const client = member.client;
+        const client           = member.client;
         const welcomeChannelId = process.env.WELCOME_CHANNEL_ID;
 
         if (!welcomeChannelId) {
@@ -19,6 +26,8 @@ module.exports = {
             return;
         }
 
+        // Fetch the channel directly from the API to guarantee we have it,
+        // even if it is not in the cache yet.
         let channel;
         try {
             channel = await client.channels.fetch(welcomeChannelId);
@@ -37,7 +46,7 @@ module.exports = {
             return;
         }
 
-        const inviteUrl = process.env.INVITE_URL || "https://discord.com/oauth2/authorize?client_id=1477557922786447411&permissions=8&integration_type=0&scope=bot";
+        const inviteUrl    = process.env.INVITE_URL || "https://discord.com/oauth2/authorize?client_id=1477557922786447411&permissions=8&integration_type=0&scope=bot";
         const memberAvatar = member.user.displayAvatarURL({ dynamic: true, size: 256 });
 
         const container = new ContainerBuilder()
