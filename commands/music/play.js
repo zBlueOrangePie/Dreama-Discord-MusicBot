@@ -70,7 +70,10 @@ module.exports = {
             });
         }
 
-        const guildConfig = await GuildConfig.findOne({ guildId: guild.id });
+        // Re-use the GuildConfig already fetched by interactionCreate.js to
+        // avoid a second DB round-trip before deferReply.
+        const guildConfig = interaction._guildConfig
+            ?? await GuildConfig.findOne({ guildId: guild.id }).catch(() => null);
         if (guildConfig?.musicVoice && voiceChannel.id !== guildConfig.musicVoice) {
             return interaction.reply({
                 embeds: [
@@ -246,7 +249,12 @@ module.exports = {
             });
         }
 
-        await interaction.deleteReply().catch(() => null);
+        try {
+            await interaction.deleteReply();
+        } catch (err) {
+            console.error("[Play] ❌ deleteReply failed, falling back to editReply:", err);
+            await interaction.editReply({ content: "▶️ Starting playback..." }).catch(() => null);
+        }
         await player.play();
     },
 };
