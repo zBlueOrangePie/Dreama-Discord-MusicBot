@@ -1,11 +1,5 @@
 require("dotenv").config();
-const {
-    SlashCommandBuilder,
-    EmbedBuilder,
-    ContainerBuilder,
-    MessageFlags,
-    SeparatorSpacingSize,
-} = require("discord.js");
+const { SlashCommandBuilder, EmbedBuilder, ContainerBuilder, MessageFlags, SeparatorSpacingSize } = require("discord.js");
 const { formatDuration } = require("../../utils/formatDuration.js");
 const { syncNpMessage } = require("../../utils/npButtonUtils.js");
 const { logger } = require("../../utils/logger.js");
@@ -14,7 +8,7 @@ const GuildConfig = require("../../utils/database/configDb.js");
 const COLORS = {
     DEFAULT: "FF7F50",
     SUCCESS: "50C878",
-    ERROR:   "FF0000",
+    ERROR: "FF0000",
 };
 
 const SUPPORTED_URL_PATTERNS = [
@@ -28,7 +22,6 @@ const SUPPORTED_URL_PATTERNS = [
 
 const URL_REGEX = /^https?:\/\//i;
 
-// Builds a quick ephemeral error reply before deferring.
 function replyError(interaction, title, description, footer) {
     return interaction.reply({
         embeds: [
@@ -43,7 +36,6 @@ function replyError(interaction, title, description, footer) {
     });
 }
 
-// Builds a deferred error reply after deferring (edits the "thinking" message).
 function editError(interaction, title, description, footer) {
     return interaction.editReply({
         embeds: [
@@ -69,16 +61,14 @@ module.exports = {
         ),
 
     async execute(interaction) {
-        const client       = interaction.client;
-        const member       = interaction.member;
-        const guild        = interaction.guild;
+        const client = interaction.client;
+        const member = interaction.member;
+        const guild = interaction.guild;
         const voiceChannel = member.voice?.channel;
-        const footer       = process.env.FOOTER || "Dreama";
-        const avatarURL    = client?.user?.displayAvatarURL({ dynamic: true, size: 256 })
+        const footer = process.env.FOOTER || "Dreama";
+        const avatarURL = client?.user?.displayAvatarURL({ dynamic: true, size: 256 })
             ?? "https://cdn.discordapp.com/embed/avatars/0.png";
-        const query        = interaction.options.getString("query");
-
-        // ── Pre-defer validation (these must use reply(), not editReply()) ───
+        const query = interaction.options.getString("query");
 
         if (!voiceChannel) {
             return replyError(
@@ -99,8 +89,6 @@ module.exports = {
             );
         }
 
-        // Re-use the GuildConfig already fetched by interactionCreate.js so we
-        // don't burn a second DB round-trip before deferReply is called.
         const guildConfig = interaction._guildConfig
             ?? await GuildConfig.findOne({ guildId: guild.id }).catch(() => null);
 
@@ -122,23 +110,16 @@ module.exports = {
             );
         }
 
-        // ── Defer ────────────────────────────────────────────────────────────
-        // Everything past this point must use editReply(), not reply().
-
         await interaction.deferReply();
 
-        // ── Player setup ─────────────────────────────────────────────────────
-
         const player = client.lavalink.createPlayer({
-            guildId:        guild.id,
+            guildId: guild.id,
             voiceChannelId: voiceChannel.id,
-            textChannelId:  interaction.channel.id,
-            selfDeaf:       true,
+            textChannelId: interaction.channel.id,
+            selfDeaf: true,
         });
 
         if (!player.connected) await player.connect();
-
-        // ── URL validation ───────────────────────────────────────────────────
 
         if (URL_REGEX.test(query)) {
             const isSupported = SUPPORTED_URL_PATTERNS.some(p => p.test(query));
@@ -153,8 +134,6 @@ module.exports = {
                 );
             }
         }
-
-        // ── Search ───────────────────────────────────────────────────────────
 
         let result;
         try {
@@ -187,11 +166,8 @@ module.exports = {
             );
         }
 
-        // ── Queue and respond ─────────────────────────────────────────────────
-
         const wasPlaying = player.playing || player.paused;
 
-        // ── Playlist ──────────────────────────────────────────────────────────
         if (result.loadType === "playlist") {
             await player.queue.add(result.tracks);
             if (wasPlaying) await syncNpMessage(player);
@@ -226,11 +202,9 @@ module.exports = {
             });
         }
 
-        // ── Single track ───────────────────────────────────────────────────────
         const track = result.tracks[0];
         await player.queue.add(track);
 
-        // Already playing — show "Added to Queue" and update the NP card.
         if (wasPlaying) {
             await syncNpMessage(player);
 
@@ -264,10 +238,6 @@ module.exports = {
             });
         }
 
-        // Not playing — the trackStart event will send the full NP card.
-        // We delete the deferred reply so it doesn't linger above the NP card.
-        // If deletion fails for any reason we fall back to an editReply so the
-        // "thinking..." state is always resolved and never left hanging.
         try {
             await interaction.deleteReply();
         } catch (err) {
