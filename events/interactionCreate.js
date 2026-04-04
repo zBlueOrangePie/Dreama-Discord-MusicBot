@@ -115,6 +115,11 @@ module.exports = {
             try {
                 const config = await GuildConfig.findOne({ guildId: interaction.guildId });
 
+                // Attach to the interaction so commands can read it without a
+                // second round-trip to MongoDB (which eats into the 3-second
+                // window before deferReply must be called).
+                interaction._guildConfig = config ?? null;
+
                 if (config?.musicChannel && interaction.channelId !== config.musicChannel) {
                     const footer = process.env.FOOTER || "Dreama";
 
@@ -132,30 +137,34 @@ module.exports = {
                 }
             } catch {
                 // If the DB check fails, allow the command through
+                interaction._guildConfig = null;
             }
         }
 
         try {
             await command.execute(interaction);
         } catch (error) {
-            console.error(error);
+            console.error("[InteractionCreate] ❌ Command threw an error:", error);
 
-            if (interaction.replied) {
-                await interaction.followUp({
-                    embeds: [errorEmbed1],
-                    flags: MessageFlags.Ephemeral,
-                });
-            } else if (interaction.deferred) {
-                await interaction.editReply({
-                    embeds: [errorEmbed1],
-                });
-            } else {
-                await interaction.reply({
-                    embeds: [errorEmbed2],
-                    flags: MessageFlags.Ephemeral,
-                });
+            try {
+                if (interaction.replied) {
+                    await interaction.followUp({
+                        embeds: [errorEmbed1()],
+                        flags: MessageFlags.Ephemeral,
+                    });
+                } else if (interaction.deferred) {
+                    await interaction.editReply({
+                        embeds: [errorEmbed1()],
+                    });
+                } else {
+                    await interaction.reply({
+                        embeds: [errorEmbed2()],
+                        flags: MessageFlags.Ephemeral,
+                    });
+                }
+            } catch (followUpError) {
+                console.error("[InteractionCreate] ❌ Failed to send error response to user:", followUpError);
             }
         }
     },
 };
-    
