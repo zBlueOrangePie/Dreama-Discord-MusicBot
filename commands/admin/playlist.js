@@ -1,6 +1,13 @@
 require("dotenv").config();
-const { SlashCommandBuilder, EmbedBuilder, ContainerBuilder, MessageFlags, PermissionFlagsBits, SeparatorSpacingSize } = require("discord.js");
-const Playlist = require("../../utils/database/playlistDb.js");
+const {
+    SlashCommandBuilder,
+    EmbedBuilder,
+    ContainerBuilder,
+    MessageFlags,
+    PermissionFlagsBits,
+    SeparatorSpacingSize,
+} = require("discord.js");
+const Playlist   = require("../../utils/database/playlistDb.js");
 const GuildConfig = require("../../utils/database/configDb.js");
 const { formatDuration } = require("../../utils/formatDuration.js");
 const { buildViewComponents } = require("../../utils/playlistButtonUtils.js");
@@ -10,7 +17,7 @@ const { logger } = require("../../utils/logger.js");
 const COLORS = {
     DEFAULT: "FF7F50",
     SUCCESS: "50C878",
-    ERROR: "FF0000",
+    ERROR:   "FF0000",
 };
 
 const SUPPORTED_URL_PATTERNS = [
@@ -127,15 +134,19 @@ module.exports = {
 
 
     async execute(interaction) {
-        const client = interaction.client;
-        const guild = interaction.guild;
-        const user = interaction.user;
-        const member = interaction.member;
-        const footer = process.env.FOOTER || "Dreama";
-        const avatarURL = client?.user?.displayAvatarURL({ dynamic: true, size: 256 })
+        const client     = interaction.client;
+        const guild      = interaction.guild;
+        const user       = interaction.user;
+        const member     = interaction.member;
+        const footer     = process.env.FOOTER || "Dreama";
+        const avatarURL  = client?.user?.displayAvatarURL({ dynamic: true, size: 256 })
             ?? "https://cdn.discordapp.com/embed/avatars/0.png";
         const subcommand = interaction.options.getSubcommand();
 
+
+        // ─────────────────────────────────────────────────────────────────
+        // CREATE-SERVER
+        // ─────────────────────────────────────────────────────────────────
         if (subcommand === "create-server") {
             const hasPerms =
                 member.permissions.has(PermissionFlagsBits.Administrator) ||
@@ -170,20 +181,20 @@ module.exports = {
                 });
             }
 
-            const name = interaction.options.getString("name");
+            const name        = interaction.options.getString("name");
             const description = interaction.options.getString("description");
-            const playlistId = await generateUniqueId();
+            const playlistId  = await generateUniqueId();
 
             await Playlist.create({
                 playlistId,
                 name,
                 description,
-                type: "server",
-                guildId: guild.id,
-                creatorId: user.id,
-                creatorUsername: user.username,
+                type:               "server",
+                guildId:            guild.id,
+                creatorId:          user.id,
+                creatorUsername:    user.username,
                 creatorDisplayName: user.displayName || user.globalName || user.username,
-                songs: [],
+                songs:              [],
             });
 
             return interaction.reply({
@@ -193,16 +204,8 @@ module.exports = {
                         .setTitle("🏠 Server Playlist Created!")
                         .setDescription(`Your server playlist **${name}** has been created successfully!`)
                         .addFields(
-                            { 
-                                name: "Playlist ID", 
-                                value: `\`${playlistId}\``, 
-                                inline: true 
-                            },
-                            { 
-                                name: "Type",        
-                                value: "🏠 Server",          
-                                inline: true 
-                            },
+                            { name: "Playlist ID", value: `\`${playlistId}\``, inline: true },
+                            { name: "Type",        value: "🏠 Server",          inline: true },
                         )
                         .setThumbnail(avatarURL)
                         .setFooter({ text: `${footer} • This playlist is only usable in this server.` })
@@ -211,21 +214,25 @@ module.exports = {
             });
         }
 
+
+        // ─────────────────────────────────────────────────────────────────
+        // CREATE-GLOBAL
+        // ─────────────────────────────────────────────────────────────────
         if (subcommand === "create-global") {
-            const name = interaction.options.getString("name");
+            const name        = interaction.options.getString("name");
             const description = interaction.options.getString("description");
-            const playlistId = await generateUniqueId();
+            const playlistId  = await generateUniqueId();
 
             await Playlist.create({
                 playlistId,
                 name,
                 description,
-                type: "global",
-                guildId: null,
-                creatorId: user.id,
-                creatorUsername: user.username,
+                type:               "global",
+                guildId:            null,
+                creatorId:          user.id,
+                creatorUsername:    user.username,
                 creatorDisplayName: user.displayName || user.globalName || user.username,
-                songs: [],
+                songs:              [],
             });
 
             return interaction.reply({
@@ -235,16 +242,8 @@ module.exports = {
                         .setTitle("🔒 Private Global Playlist Created!")
                         .setDescription(`Your private global playlist **${name}** has been created successfully!`)
                         .addFields(
-                            { 
-                                name: "Playlist ID", 
-                                value: `\`${playlistId}\``, 
-                                inline: true 
-                            },
-                            { 
-                                name: "Type",       
-                                value: "🔒 Private Global", 
-                                inline: true 
-                            },
+                            { name: "Playlist ID", value: `\`${playlistId}\``, inline: true },
+                            { name: "Type",        value: "🔒 Private Global", inline: true },
                         )
                         .setThumbnail(avatarURL)
                         .setFooter({ text: `${footer} • Only you can view, manage, and play this playlist.` })
@@ -253,15 +252,14 @@ module.exports = {
             });
         }
 
+
+        // ─────────────────────────────────────────────────────────────────
+        // LIST — show all playlists the user has created
+        // ─────────────────────────────────────────────────────────────────
         if (subcommand === "list") {
             const [serverPlaylists, globalPlaylists] = await Promise.all([
-                Playlist.find({ 
-                    creatorId: user.id, 
-                    type: "server", 
-                    guildId: guild.id }).lean(),
-                Playlist.find({ 
-                    creatorId: user.id, 
-                    type: "global" }).lean(),
+                Playlist.find({ creatorId: user.id, type: "server", guildId: guild.id }).lean(),
+                Playlist.find({ creatorId: user.id, type: "global" }).lean(),
             ]);
 
             const totalCount = serverPlaylists.length + globalPlaylists.length;
@@ -303,16 +301,8 @@ module.exports = {
                         .setColor(COLORS.DEFAULT)
                         .setTitle("📋 Your Playlists")
                         .addFields(
-                            { 
-                                name: "🏠 Server Playlists (this guild)", 
-                                value: serverList, 
-                                inline: false 
-                            },
-                            { 
-                                name: "🔒 Private Global Playlists",      
-                                value: globalList, 
-                                inline: false 
-                            },
+                            { name: "🏠 Server Playlists (this guild)", value: serverList, inline: false },
+                            { name: "🔒 Private Global Playlists",      value: globalList, inline: false },
                         )
                         .setThumbnail(avatarURL)
                         .setFooter({ text: `${footer} • Use /playlist view <id> to inspect a playlist` })
@@ -329,7 +319,7 @@ module.exports = {
             const query = interaction.options.getString("name");
 
             const safeQuery = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-            const regex = new RegExp(safeQuery, "i");
+            const regex     = new RegExp(safeQuery, "i");
 
             const results = await Playlist.find({
                 creatorId: user.id,
@@ -369,9 +359,13 @@ module.exports = {
             });
         }
 
+
+        // ─────────────────────────────────────────────────────────────────
+        // VIEW
+        // ─────────────────────────────────────────────────────────────────
         if (subcommand === "view") {
             const playlistId = interaction.options.getString("playlist-id");
-            const playlist = await Playlist.findOne({ playlistId }).lean();
+            const playlist   = await Playlist.findOne({ playlistId }).lean();
 
             if (!playlist) {
                 return interaction.reply({
@@ -402,7 +396,7 @@ module.exports = {
                 });
             }
 
-            // Global playlists are private to their creator but can be used to any guild.
+            // Global playlists are private to their creator
             if (playlist.type === "global" && playlist.creatorId !== user.id) {
                 return interaction.reply({
                     embeds: [
@@ -423,9 +417,13 @@ module.exports = {
             });
         }
 
+
+        // ─────────────────────────────────────────────────────────────────
+        // ADD-SONG
+        // ─────────────────────────────────────────────────────────────────
         if (subcommand === "add-song") {
             const playlistId = interaction.options.getString("playlist-id");
-            const query = interaction.options.getString("query");
+            const query      = interaction.options.getString("query");
 
             if (!isUrlSupported(query)) {
                 return interaction.reply({
@@ -555,24 +553,24 @@ module.exports = {
 
             if (result.loadType === "playlist") {
                 tracksToAdd = result.tracks.map(t => ({
-                    title: t.info.title,
-                    uri: t.info.uri,
-                    author: t.info.author || "Unknown",
-                    duration: t.info.duration || 0,
+                    title:      t.info.title,
+                    uri:        t.info.uri,
+                    author:     t.info.author     || "Unknown",
+                    duration:   t.info.duration   || 0,
                     sourceName: t.info.sourceName || "unknown",
                     artworkUrl: t.info.artworkUrl || null,
-                    addedBy: user.username,
+                    addedBy:    user.username,
                 }));
             } else {
                 const track = result.tracks[0];
                 tracksToAdd = [{
-                    title: track.info.title,
-                    uri: track.info.uri,
-                    author: track.info.author || "Unknown",
-                    duration: track.info.duration || 0,
+                    title:      track.info.title,
+                    uri:        track.info.uri,
+                    author:     track.info.author     || "Unknown",
+                    duration:   track.info.duration   || 0,
                     sourceName: track.info.sourceName || "unknown",
                     artworkUrl: track.info.artworkUrl || null,
-                    addedBy: user.username,
+                    addedBy:    user.username,
                 }];
             }
 
@@ -596,23 +594,11 @@ module.exports = {
                         .addFields(
                             result.loadType !== "playlist"
                                 ? [
-                                    { 
-                                        name: "Author",   
-                                        value: first.author,                   
-                                        inline: true 
-                                    },
-                                    { 
-                                        name: "Duration", 
-                                        value: formatDuration(first.duration), 
-                                        inline: true 
-                                    },
+                                    { name: "Author",   value: first.author,                   inline: true },
+                                    { name: "Duration", value: formatDuration(first.duration), inline: true },
                                 ]
                                 : [
-                                    { 
-                                        name: "Tracks Added", 
-                                        value: `${tracksToAdd.length}`, 
-                                        inline: true 
-                                    },
+                                    { name: "Tracks Added", value: `${tracksToAdd.length}`, inline: true },
                                 ]
                         )
                         .setThumbnail(first.artworkUrl || avatarURL)
@@ -622,10 +608,14 @@ module.exports = {
             });
         }
 
+
+        // ─────────────────────────────────────────────────────────────────
+        // REMOVE-SONG
+        // ─────────────────────────────────────────────────────────────────
         if (subcommand === "remove-song") {
             const playlistId = interaction.options.getString("playlist-id");
-            const songQuery = interaction.options.getString("song");
-            const playlist = await Playlist.findOne({ playlistId });
+            const songQuery  = interaction.options.getString("song");
+            const playlist   = await Playlist.findOne({ playlistId });
 
             if (!playlist) {
                 return interaction.reply({
@@ -656,7 +646,7 @@ module.exports = {
             }
 
             const lowerQuery = songQuery.toLowerCase().trim();
-            const songIndex = playlist.songs.findIndex(s =>
+            const songIndex  = playlist.songs.findIndex(s =>
                 s.uri === songQuery ||
                 s.title.toLowerCase() === lowerQuery ||
                 s.title.toLowerCase().includes(lowerQuery)
@@ -691,16 +681,8 @@ module.exports = {
                         .setTitle("🗑️ Song Removed from Playlist")
                         .setDescription(`**${removedSong.title}** has been permanently removed from \`${playlistId}\`.`)
                         .addFields(
-                            { 
-                                name: "Author",   
-                                value: removedSong.author || "Unknown",      
-                                inline: true 
-                            },
-                            { 
-                                name: "Duration", 
-                                value: formatDuration(removedSong.duration), 
-                                inline: true 
-                            },
+                            { name: "Author",   value: removedSong.author || "Unknown",      inline: true },
+                            { name: "Duration", value: formatDuration(removedSong.duration), inline: true },
                         )
                         .setThumbnail(removedSong.artworkUrl || avatarURL)
                         .setFooter({ text: footer })
@@ -708,10 +690,14 @@ module.exports = {
                 ],
             });
         }
-        
+
+
+        // ─────────────────────────────────────────────────────────────────
+        // DELETE-SERVER
+        // ─────────────────────────────────────────────────────────────────
         if (subcommand === "delete-server") {
             const playlistId = interaction.options.getString("playlist-id");
-            const playlist = await Playlist.findOne({ playlistId });
+            const playlist   = await Playlist.findOne({ playlistId });
 
             if (!playlist) {
                 return interaction.reply({
@@ -784,9 +770,13 @@ module.exports = {
             });
         }
 
+
+        // ─────────────────────────────────────────────────────────────────
+        // DELETE-GLOBAL
+        // ─────────────────────────────────────────────────────────────────
         if (subcommand === "delete-global") {
             const playlistId = interaction.options.getString("playlist-id");
-            const playlist = await Playlist.findOne({ playlistId });
+            const playlist   = await Playlist.findOne({ playlistId });
 
             if (!playlist) {
                 return interaction.reply({
@@ -845,9 +835,13 @@ module.exports = {
             });
         }
 
+
+        // ─────────────────────────────────────────────────────────────────
+        // PLAY
+        // ─────────────────────────────────────────────────────────────────
         if (subcommand === "play") {
             const playlistId = interaction.options.getString("playlist-id");
-            const playlist = await Playlist.findOne({ playlistId }).lean();
+            const playlist   = await Playlist.findOne({ playlistId }).lean();
 
             if (!playlist) {
                 return interaction.reply({
@@ -960,21 +954,21 @@ module.exports = {
             await interaction.deferReply();
 
             const player = client.lavalink.createPlayer({
-                guildId: interaction.guildId,
+                guildId:        interaction.guildId,
                 voiceChannelId: voiceChannel.id,
-                textChannelId: interaction.channelId,
-                selfDeaf: true,
+                textChannelId:  interaction.channelId,
+                selfDeaf:       true,
             });
 
             if (!player.connected) await player.connect();
 
             const wasPlaying = player.playing || player.paused;
-            let loaded = 0;
+            let loaded       = 0;
 
             for (const song of playlist.songs) {
                 try {
-                    // Try the stored URI first. If lavalink cannot resolve it 
-                    // (e.g. expired YouTube stream) then, fall back to a title search.
+                    // Try the stored URI first. If lavalink cannot resolve it
+                    // (e.g. expired YouTube stream), fall back to a title search.
                     let res = await player.search({ query: song.uri }, user);
 
                     if (!res?.tracks?.length || res.loadType === "empty" || res.loadType === "error") {
