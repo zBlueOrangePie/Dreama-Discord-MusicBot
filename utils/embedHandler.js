@@ -4,14 +4,14 @@ const { EmbedBuilder } = require("discord.js");
 const username = process.env.USERNAME || "Dreama";
 const footer = process.env.FOOTER || "Dreama";
 
-const errorEmbed1 = new EmbedBuilder()
+const errorEmbed1 = () => new EmbedBuilder()
     .setColor("FF0000")
     .setTitle("Error")
     .setDescription("An error occurred while executing this command.")
     .setFooter({ text: footer })
     .setTimestamp();
 
-const errorEmbed2 = new EmbedBuilder()
+const errorEmbed2 = () => new EmbedBuilder()
     .setColor("FF0000")
     .setTitle("Error")
     .setDescription("Something went wrong. Please try again later.")
