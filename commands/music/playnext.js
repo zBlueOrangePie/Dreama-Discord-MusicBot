@@ -1,5 +1,11 @@
 require("dotenv").config();
-const { SlashCommandBuilder, EmbedBuilder, ContainerBuilder, MessageFlags, SeparatorSpacingSize } = require("discord.js");
+const {
+    SlashCommandBuilder,
+    EmbedBuilder,
+    ContainerBuilder,
+    MessageFlags,
+    SeparatorSpacingSize,
+} = require("discord.js");
 const { formatDuration } = require("../../utils/formatDuration.js");
 const { syncNpMessage } = require("../../utils/npButtonUtils.js");
 const { logger } = require("../../utils/logger.js");
@@ -7,7 +13,7 @@ const { logger } = require("../../utils/logger.js");
 const COLORS = {
     DEFAULT: "FF7F50",
     SUCCESS: "50C878",
-    ERROR: "FF0000",
+    ERROR:   "FF0000",
 };
 
 module.exports = {
@@ -22,14 +28,14 @@ module.exports = {
         ),
 
     async execute(interaction) {
-        const client = interaction.client;
-        const member = interaction.member;
-        const guild = interaction.guild;
+        const client       = interaction.client;
+        const member       = interaction.member;
+        const guild        = interaction.guild;
         const voiceChannel = member.voice?.channel;
-        const footer = process.env.FOOTER || "Dreama";
-        const avatarURL = client?.user?.displayAvatarURL({ dynamic: true, size: 256 })
+        const footer       = process.env.FOOTER || "Dreama";
+        const avatarURL    = client?.user?.displayAvatarURL({ dynamic: true, size: 256 })
             ?? "https://cdn.discordapp.com/embed/avatars/0.png";
-        const query = interaction.options.getString("query");
+        const query        = interaction.options.getString("query");
 
         if (!voiceChannel) {
             return interaction.reply({
@@ -117,7 +123,7 @@ module.exports = {
         const thumbnailUrl = track.info.artworkUrl || avatarURL;
 
         const container = new ContainerBuilder()
-            .setAccentColor(0xFF7F50)
+            .setAccentColor(0x50C878)
             .addSectionComponents((section) =>
                 section
                     .addTextDisplayComponents((text) =>
@@ -132,8 +138,8 @@ module.exports = {
             )
             .addTextDisplayComponents((text) =>
                 text.setContent(
-                    `**Author:** ${track.info.author || "Unknown"}\n` +
-                    `**Duration:** ${formatDuration(track.info.duration)}\n` +
+                    `**Author:** ${track.info.author || "Unknown"}   ·   ` +
+                    `**Duration:** ${formatDuration(track.info.duration)}   ·   ` +
                     `**Requested by:** ${interaction.user}\n` +
                     `-# ${footer} · This track will play right after the current one.`
                 )

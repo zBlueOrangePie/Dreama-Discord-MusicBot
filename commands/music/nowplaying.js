@@ -5,13 +5,13 @@ const { formatDuration } = require("../../utils/formatDuration.js");
 
 const COLORS = {
     DEFAULT: "FF7F50",
-    ERROR: "FF0000",
+    ERROR:   "FF0000",
 };
 
 const REPEAT_LABELS = {
     off:   "Off",
-    track: "Track",
-    queue: "Queue",
+    track: "🔂 Track",
+    queue: "🔁 Queue",
 };
 
 module.exports = {
@@ -21,7 +21,7 @@ module.exports = {
 
     async execute(interaction) {
         const client = interaction.client;
-        const guild = interaction.guild;
+        const guild  = interaction.guild;
         const footer = process.env.FOOTER || "Dreama";
 
         const player = client.lavalink.getPlayer(guild.id);
@@ -58,14 +58,14 @@ module.exports = {
 
         await interaction.deferReply();
 
-        const repeatMode = player.repeatMode ?? "off";
-        const autoplay = player.get("autoplay") ?? false;
+        const repeatMode  = player.repeatMode ?? "off";
+        const autoplay    = player.get("autoplay") ?? false;
         const queueLength = player.queue?.tracks?.length ?? 0;
-        const positionMs = player.position ?? 0;
-        const durationMs = track.info.duration ?? 0;
+        const positionMs  = player.position ?? 0;
+        const durationMs  = track.info.duration ?? 0;
 
         // Build the image card
-        const imageBuffer = await buildNpImageCard(track).catch(() => null);
+        const imageBuffer     = await buildNpImageCard(track).catch(() => null);
         const imageAttachment = imageBuffer
             ? new AttachmentBuilder(imageBuffer, { name: "nowplaying.png" })
             : null;
@@ -76,41 +76,13 @@ module.exports = {
             .setTitle("🎵 Now Playing")
             .setDescription(`**[${track.info.title}](${track.info.uri})**`)
             .addFields(
-                { 
-                    name: "Author",       
-                    value: track.info.author     || "Unknown",                    
-                    inline: true  
-                },
-                { 
-                    name: "Source",   
-                    value: track.info.sourceName || "Unknown",     
-                    inline: true  
-                },
-                {
-                    name: "Requested by", 
-                    value: track.requester?.username ?? "Unknown",   
-                    inline: true  
-                },
-                { 
-                    name: "Progress",    
-                    value: `${formatDuration(positionMs)} / ${formatDuration(durationMs)}`, 
-                    inline: true  
-                },
-                { 
-                    name: "Repeat",   
-                    value: REPEAT_LABELS[repeatMode] ?? "Off",   
-                    inline: true  
-                },
-                { 
-                    name: "Autoplay",  
-                    value: autoplay ? "On" : "Off",   
-                    inline: true  
-                },
-                { 
-                    name: "In Queue",   
-                    value: `${queueLength} track(s) remaining`,     
-                    inline: false 
-                },
+                { name: "Author",       value: track.info.author     || "Unknown",                    inline: true  },
+                { name: "Source",       value: track.info.sourceName || "Unknown",                    inline: true  },
+                { name: "Requested by", value: track.requester?.username ?? "Unknown",                inline: true  },
+                { name: "Progress",     value: `${formatDuration(positionMs)} / ${formatDuration(durationMs)}`, inline: true  },
+                { name: "Repeat",       value: REPEAT_LABELS[repeatMode] ?? "Off",                    inline: true  },
+                { name: "Autoplay",     value: autoplay ? "On" : "Off",                               inline: true  },
+                { name: "In Queue",     value: `${queueLength} track(s) remaining`,                   inline: false },
             )
             .setFooter({ text: footer })
             .setTimestamp();
