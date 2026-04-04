@@ -60,7 +60,8 @@ module.exports = {
             });
         }
 
-        const guildConfig = await GuildConfig.findOne({ guildId: guild.id });
+        const guildConfig = interaction._guildConfig
+            ?? await GuildConfig.findOne({ guildId: guild.id }).catch(() => null);
         if (guildConfig?.musicVoice && voiceChannel.id !== guildConfig.musicVoice) {
             return interaction.reply({
                 embeds: [
