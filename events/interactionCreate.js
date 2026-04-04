@@ -51,16 +51,23 @@ module.exports = {
         if (interaction.isStringSelectMenu()) {
             const id = interaction.customId;
 
-            if (id === "recommend_genre") {
-                return handleRecommendSelect(interaction, client);
-            }
+            try {
+                if (id === "recommend_genre") {
+                    return await handleRecommendSelect(interaction, client);
+                }
 
-            if (id.startsWith("removetrack_select_")) {
-                return handleRemoveTrackSelect(interaction, client);
-            }
+                if (id.startsWith("removetrack_select_")) {
+                    return await handleRemoveTrackSelect(interaction, client);
+                }
 
-            if (id.startsWith("addtrack_pos_")) {
-                return handleAddTrackSelect(interaction, client);
+                if (id.startsWith("addtrack_pos_")) {
+                    return await handleAddTrackSelect(interaction, client);
+                }
+            } catch (err) {
+                console.error("[SelectMenu] ❌ Error handling select menu:", err);
+                if (!interaction.replied && !interaction.deferred) {
+                    await interaction.reply({ content: "❌ Something went wrong.", flags: MessageFlags.Ephemeral }).catch(() => null);
+                }
             }
 
             return;
@@ -69,20 +76,27 @@ module.exports = {
         if (interaction.isButton()) {
             const id = interaction.customId;
 
-            if (NP_BUTTON_IDS.includes(id)) {
-                return handleNpButton(interaction, client);
-            }
+            try {
+                if (NP_BUTTON_IDS.includes(id)) {
+                    return await handleNpButton(interaction, client);
+                }
 
-            if (id.startsWith(QUEUE_BUTTON_PREFIX) && !id.startsWith("queue_page_indicator")) {
-                return handleQueueButton(interaction, client);
-            }
+                if (id.startsWith(QUEUE_BUTTON_PREFIX) && !id.startsWith("queue_page_indicator")) {
+                    return await handleQueueButton(interaction, client);
+                }
 
-            if (id.startsWith(SEARCH_BUTTON_PREFIX) || id === "search_track_all" || id === "search_cancel") {
-                return handleSearchButton(interaction, client);
-            }
+                if (id.startsWith(SEARCH_BUTTON_PREFIX) || id === "search_track_all" || id === "search_cancel") {
+                    return await handleSearchButton(interaction, client);
+                }
 
-            if (id.startsWith(PLAYLIST_VIEW_PREFIX) && !id.startsWith("playlist_view_indicator")) {
-                return handlePlaylistViewButton(interaction, client);
+                if (id.startsWith(PLAYLIST_VIEW_PREFIX) && !id.startsWith("playlist_view_indicator")) {
+                    return await handlePlaylistViewButton(interaction, client);
+                }
+            } catch (err) {
+                console.error("[Button] ❌ Error handling button:", err);
+                if (!interaction.replied && !interaction.deferred) {
+                    await interaction.reply({ content: "❌ Something went wrong.", flags: MessageFlags.Ephemeral }).catch(() => null);
+                }
             }
 
             return;
@@ -126,10 +140,14 @@ module.exports = {
         } catch (error) {
             console.error(error);
 
-            if (interaction.replied || interaction.deferred) {
+            if (interaction.replied) {
                 await interaction.followUp({
                     embeds: [errorEmbed1],
                     flags: MessageFlags.Ephemeral,
+                });
+            } else if (interaction.deferred) {
+                await interaction.editReply({
+                    embeds: [errorEmbed1],
                 });
             } else {
                 await interaction.reply({
